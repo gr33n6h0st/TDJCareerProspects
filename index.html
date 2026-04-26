@@ -3,203 +3,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TDJ Career Matcher</title>
+    <title>TDJ Career Explorer</title>
     <style>
         :root {
-            --bg: #f8fafc;
-            --dark: #0f172a;
-            --accent: #6366f1;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --accent: #38bdf8;
+            --text: #f8fafc;
             --success: #10b981;
-            --error: #ef4444;
         }
 
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: var(--bg);
-            color: var(--dark);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
             margin: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
-        header {
-            background: var(--dark);
-            color: white;
-            padding: 20px;
+        /* HUB STYLES */
+        #hub-page {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            padding: 50px 20px;
+            transition: transform 0.5s ease-in-out;
         }
 
-        h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; }
-        .score-display { background: var(--accent); padding: 5px 15px; border-radius: 20px; font-weight: bold; }
-
-        .main-grid {
+        .hub-grid {
             display: grid;
-            grid-template-columns: 350px 1fr;
-            gap: 40px;
-            padding: 40px;
-            max-width: 1200px;
-            margin: 0 auto;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 1000px;
             width: 100%;
-            flex: 1;
-            box-sizing: border-box;
         }
 
-        .column { display: flex; flex-direction: column; gap: 15px; }
-        .section-label { font-size: 0.8rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-
-        .skill-box {
-            background: white;
-            padding: 18px;
-            border-radius: 12px;
-            border: 2px solid #e2e8f0;
-            cursor: grab;
-            font-weight: 600;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            transition: all 0.2s;
-        }
-        .skill-box:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-        .skill-box:active { cursor: grabbing; }
-
-        .career-card {
-            background: white;
-            border: 2px dashed #cbd5e1;
-            padding: 20px;
+        .category-card {
+            background: var(--card);
+            padding: 40px 20px;
             border-radius: 16px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            min-height: 80px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
             transition: all 0.3s;
-            position: relative;
         }
 
-        .career-card.hover { border-color: var(--accent); background: #f5f3ff; }
-        .career-card.correct { border: 2px solid var(--success); background: #f0fdf4; color: var(--success); border-style: solid; }
+        .category-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-10px);
+            background: #27354d;
+        }
 
-        .career-name { font-weight: 800; font-size: 1.1rem; margin-bottom: 4px; }
-        .career-field { font-size: 0.8rem; font-weight: 600; color: #64748b; }
-
-        /* Success Pop-up */
-        #popup {
+        /* CHALLENGE PAGE STYLES */
+        #challenge-page {
             display: none;
             position: fixed;
-            top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: white;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg);
             padding: 40px;
-            border-radius: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            box-sizing: border-box;
             z-index: 100;
-            text-align: center;
-            max-width: 400px;
-            border: 4px solid var(--success);
         }
 
-        #popup h2 { margin-top: 0; color: var(--success); }
-        #popup button { background: var(--dark); color: white; border: none; padding: 12px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .back-btn {
+            background: none; border: 1px solid var(--accent);
+            color: var(--accent); padding: 10px 20px; border-radius: 8px;
+            cursor: pointer; margin-bottom: 20px;
+        }
 
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 90; }
+        .challenge-container {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
+            max-width: 1100px; margin: 0 auto;
+        }
+
+        .skill-box {
+            background: var(--card); padding: 15px; border-radius: 8px;
+            cursor: grab; border-left: 5px solid var(--accent); margin-bottom: 10px;
+        }
+
+        .target-box {
+            background: rgba(255,255,255,0.05); border: 2px dashed #475569;
+            padding: 20px; border-radius: 12px; min-height: 80px;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+
+        .target-box.correct { border: 2px solid var(--success); background: rgba(16, 185, 129, 0.1); }
+
+        /* MODAL */
+        #modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 200; justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: var(--card); padding: 40px; border-radius: 20px;
+            max-width: 500px; text-align: center; border: 2px solid var(--success);
+        }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>TDJ Career Dashboard</h1>
-    <div class="score-display">MATCHED: <span id="score">0</span> / 8</div>
-</header>
-
-<div class="main-grid">
-    <div class="column" id="skills-list">
-        <div class="section-label">Your Classroom Skills</div>
-        </div>
-
-    <div class="column" id="careers-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-        <div class="section-label" style="grid-column: span 2;">Industry Target Careers</div>
-        </div>
+<div id="hub-page">
+    <h1>Technological Design Career Hub</h1>
+    <p>Select a pathway to explore the required shop and design skills.</p>
+    <div class="hub-grid">
+        <div class="category-card" onclick="openChallenge('mechanical')">⚙️ Mechanical Design</div>
+        <div class="category-card" onclick="openChallenge('architectural')">🏗️ Architectural Design</div>
+        <div class="category-card" onclick="openChallenge('robotics')">🤖 Robotics & Control</div>
+        <div class="category-card" onclick="openChallenge('industrial')">🚲 Industrial Design</div>
+        <div class="category-card" onclick="openChallenge('interior')">🛋️ Interior Design</div>
+        <div class="category-card" onclick="openChallenge('apparel')">👕 Apparel & Textile</div>
+    </div>
 </div>
 
-<div class="overlay" id="overlay"></div>
-<div id="popup">
-    <h2 id="p-title">Match!</h2>
-    <p id="p-desc"></p>
-    <button onclick="closePopup()">Continue</button>
+<div id="challenge-page">
+    <button class="back-btn" onclick="goHome()">← Back to Hub</button>
+    <h2 id="challenge-title">Field Challenge</h2>
+    <div class="challenge-container">
+        <div id="skills-col"></div>
+        <div id="targets-col"></div>
+    </div>
+</div>
+
+<div id="modal">
+    <div class="modal-content">
+        <h2 style="color:var(--success)">Deep Dive Match</h2>
+        <p id="modal-text"></p>
+        <button class="back-btn" onclick="closeModal()" style="margin-top:20px;">Keep Exploring</button>
+    </div>
 </div>
 
 <script>
-    const data = [
-        { id: '1', s: 'Isometric & Orthographic Sketching', c: 'Mechanical Technologist', f: 'Manufacturing', d: 'Standardized drawings are the blueprint for building complex machines across the world.' },
-        { id: '2', s: 'Machine Tool Safety (Bandsaws/Saws)', c: 'Industrial Fabricator', f: 'Trades / Prototype', d: 'Safely shaping wood and metal into specific forms is a high-demand industry skill.' },
-        { id: '3', s: 'Framing & Structural Assembly', c: 'Project Superintendent', f: 'Construction', d: 'Understanding how joints and skeletons hold loads is essential for managing building sites.' },
-        { id: '4', s: '3D Printing & Digital Fab', c: 'Rapid Prototyper', f: 'Tech & Aerospace', d: 'You bridge the gap between a 3D computer model and a physical object you can hold.' },
-        { id: '5', s: 'Precision Measurement', c: 'Quality Control Lead', f: 'Civil Engineering', d: 'Being accurate to the millimeter prevents massive financial losses during a build.' },
-        { id: '6', s: 'The Design Process (SPICE)', c: 'Product Designer', f: 'Innovation', d: 'The SPICE loop is the same workflow used by the world’s most successful design agencies.' },
-        { id: '7', s: 'Video & Media Documentation', c: 'Technical Media Lead', f: 'Communications', d: 'If you can’t show how a product works, the user will never understand its value.' },
-        { id: '8', s: 'Cardboard & Ergonomic Mockups', c: 'Usability Consultant', f: 'UX / Product Design', d: 'Mocking up ideas in cardboard tests if a design is comfortable for humans before building the real thing.' }
-    ];
+    const database = {
+        mechanical: [
+            { s: "ISO/Ortho Sketching", c: "Aerospace Technician", d: "In Aerospace, parts are built by different global teams. Your Orthographic sketches ensure a wing built in France fits a fuselage built in Canada perfectly." },
+            { s: "Bandsaw Safety & Metalwork", c: "Engine Fabricator", d: "Custom engine components require precise physical shaping. Knowing your shop machines allows you to prototype metal parts before high-speed testing." }
+        ],
+        architectural: [
+            { s: "Structural Framing Logic", c: "Civil Engineer", d: "Understanding how studs and joists support a roof in class is the foundation of building skyscrapers that can withstand Ontario winters and high winds." },
+            { s: "Scale Floor Plans", c: "Urban Planner", d: "Designing at 1/4 inch scale teaches you spatial awareness, which is vital when planning how thousands of people navigate a city block." }
+        ],
+        robotics: [
+            { s: "Circuitry & Logic Gates", c: "Control Systems Designer", d: "The same logic you use to wire a sensor in class is used to program factory assembly lines that build electric cars." },
+            { s: "3D Digital Prototyping", c: "Robotics Developer", d: "Digital models allow you to test joint movement (kinematics) in a simulation before you spend money on physical aluminum parts." }
+        ],
+        industrial: [
+            { s: "Cardboard Ergonomic Models", c: "Consumer Product Designer", d: "Building cardboard mockups of tool handles or phones helps engineers find the most comfortable shape for the human hand." },
+            { s: "Surface Finishing & Assembly", c: "Furniture Designer", p: "The fit and finish of a joint determine if a product feels 'premium' or 'cheap' to a customer." }
+        ],
+        interior: [
+            { s: "Material Layout & Texturing", c: "Interior Architect", d: "Knowing how to measure and layout material waste in the shop translates to calculating expensive flooring and finishes for a client." },
+            { s: "Perspective Sketching", c: "3D Renderer", d: "Drawing rooms in 2-point perspective helps clients 'see' the finished space before a single hammer is swung." }
+        ],
+        apparel: [
+            { s: "Pattern Making & Cutting", c: "Technical Designer", d: "The geometry used to layout a wood project is identical to creating patterns that allow fabric to curve around a moving body." },
+            { s: "Tensile Strength Research", c: "Apparel Development Manager", d: "Researching material durability in class is how professionals choose fabrics for high-performance athletic gear or safety vests." }
+        ]
+    };
 
-    let score = 0;
+    function openChallenge(field) {
+        document.getElementById('hub-page').style.display = 'none';
+        document.getElementById('challenge-page').style.display = 'block';
+        document.getElementById('challenge-title').innerText = field.toUpperCase() + " Field Challenge";
+        
+        const sCol = document.getElementById('skills-col');
+        const tCol = document.getElementById('targets-col');
+        sCol.innerHTML = '<div style="opacity:0.6; font-size:0.8rem; margin-bottom:10px;">CLASSROOM SKILLS</div>';
+        tCol.innerHTML = '<div style="opacity:0.6; font-size:0.8rem; margin-bottom:10px;">INDUSTRY CAREERS</div>';
 
-    function setup() {
-        const sContainer = document.getElementById('skills-list');
-        const cContainer = document.getElementById('careers-list');
+        const list = database[field];
+        
+        list.forEach((item, idx) => {
+            const sDiv = document.createElement('div');
+            sDiv.className = 'skill-box';
+            sDiv.draggable = true;
+            sDiv.innerText = item.s;
+            sDiv.id = `skill-${idx}`;
+            sDiv.addEventListener('dragstart', e => e.dataTransfer.setData('text', e.target.id));
+            sCol.appendChild(sDiv);
 
-        [...data].sort(() => Math.random() - 0.5).forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'skill-box';
-            div.draggable = true;
-            div.innerText = item.s;
-            div.id = `skill-${item.id}`;
-            div.addEventListener('dragstart', (e) => e.dataTransfer.setData('text', e.target.id));
-            sContainer.appendChild(div);
-        });
-
-        [...data].sort(() => Math.random() - 0.5).forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'career-card';
-            div.dataset.match = `skill-${item.id}`;
-            div.innerHTML = `<div class="career-name">${item.c}</div><div class="career-field">Field: ${item.f}</div>`;
-            
-            div.addEventListener('dragover', (e) => e.preventDefault());
-            div.addEventListener('dragenter', () => div.classList.add('hover'));
-            div.addEventListener('dragleave', () => div.classList.remove('hover'));
-            div.addEventListener('drop', handleDrop);
-            cContainer.appendChild(div);
+            const tDiv = document.createElement('div');
+            tDiv.className = 'target-box';
+            tDiv.dataset.match = `skill-${idx}`;
+            tDiv.dataset.desc = item.d;
+            tDiv.innerHTML = `<strong>${item.c}</strong>`;
+            tDiv.addEventListener('dragover', e => e.preventDefault());
+            tDiv.addEventListener('drop', handleDrop);
+            tCol.appendChild(tDiv);
         });
     }
 
     function handleDrop(e) {
         e.preventDefault();
-        const card = e.currentTarget;
-        card.classList.remove('hover');
-        const skillId = e.dataTransfer.getData('text');
+        const draggedId = e.dataTransfer.getData('text');
+        const target = e.currentTarget;
 
-        if (card.dataset.match === skillId) {
-            const match = data.find(d => `skill-${d.id}` === skillId);
-            card.classList.add('correct');
-            card.innerHTML = `<div class="career-name">✓ ${match.c}</div><div class="career-field">${match.s}</div>`;
-            document.getElementById(skillId).style.display = 'none';
-            
-            document.getElementById('p-desc').innerText = match.d;
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById('popup').style.display = 'block';
-            
-            score++;
-            document.getElementById('score').innerText = score;
+        if (target.dataset.match === draggedId) {
+            target.classList.add('correct');
+            document.getElementById(draggedId).style.display = 'none';
+            document.getElementById('modal-text').innerText = target.dataset.desc;
+            document.getElementById('modal').style.display = 'flex';
         } else {
-            alert("Incorrect pairing. Think about how that specific shop skill applies to the field.");
+            alert("This career requires a different specialized skill from the shop!");
         }
     }
 
-    function closePopup() {
-        document.getElementById('overlay').style.display = 'none';
-        document.getElementById('popup').style.display = 'none';
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+    function goHome() { 
+        document.getElementById('hub-page').style.display = 'flex';
+        document.getElementById('challenge-page').style.display = 'none';
     }
-
-    setup();
 </script>
 </body>
 </html>
