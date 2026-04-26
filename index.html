@@ -3,19 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Design & Tech: Career Quest</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>TDJ: The Career Blueprint</title>
     <style>
         :root {
-            --primary: #6366f1;
-            --accent: #f43f5e;
-            --glass: rgba(255, 255, 255, 0.1);
+            --blue-print: #004a99;
+            --paper: #f0f4f8;
+            --accent: #ffcc00;
+            --success: #27ae60;
             --text: #ffffff;
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background: radial-gradient(circle at top right, #1e1b4b, #0f172a, #000000);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--blue-print);
+            background-image: radial-gradient(#ffffff22 1px, transparent 1px);
+            background-size: 20px 20px;
             color: var(--text);
             margin: 0;
             height: 100vh;
@@ -26,246 +28,166 @@
 
         header {
             text-align: center;
-            padding: 25px 10px;
+            padding: 20px;
+            border-bottom: 2px solid #fff;
         }
 
-        h1 {
-            margin: 0;
-            font-size: 2rem;
-            background: linear-gradient(to right, #818cf8, #f472b6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800;
-        }
+        h1 { margin: 0; text-transform: uppercase; letter-spacing: 3px; font-size: 1.5rem; }
+        .counter { font-weight: bold; color: var(--accent); margin-top: 5px; }
 
-        .score-pill {
-            display: inline-block;
-            background: var(--glass);
-            padding: 5px 20px;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.2);
-            margin-top: 10px;
-            font-weight: 600;
-            color: #fbbf24;
-        }
-
-        .container {
+        .blueprint-table {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 30px;
-            padding: 0 40px 40px;
+            padding: 30px;
             max-width: 1100px;
             margin: 0 auto;
+            flex: 1;
             width: 100%;
             box-sizing: border-box;
-            flex: 1;
         }
 
-        .column {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+        .col { display: flex; flex-direction: column; gap: 10px; }
+        .col-title { font-size: 0.8rem; opacity: 0.7; text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid #fff; }
 
-        .col-label {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #94a3b8;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        .skill-card {
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            padding: 16px;
-            border-radius: 12px;
-            cursor: grab;
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 600;
-            font-size: 0.9rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .skill-card:hover {
-            transform: scale(1.02);
-            border-color: rgba(255,255,255,0.4);
-            background: rgba(255,255,255,0.15);
-        }
-
-        .target-card {
-            background: rgba(0, 0, 0, 0.3);
-            border: 2px dashed rgba(255,255,255,0.1);
-            border-radius: 15px;
+        .skill-node {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #fff;
             padding: 15px;
-            min-height: 65px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            transition: 0.3s;
-        }
-
-        .target-card.hover {
-            border-color: var(--primary);
-            background: rgba(99, 102, 241, 0.1);
-        }
-
-        .target-card.correct {
-            border: 2px solid #10b981;
-            background: rgba(16, 185, 129, 0.2);
-            color: #34d399;
-            animation: pulse 0.5s ease-out;
-        }
-
-        .job-name { font-weight: 800; font-size: 1rem; }
-        .job-hint { font-size: 0.75rem; opacity: 0.6; margin-top: 4px; }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        /* Modal Overlay */
-        #modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(8px);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-box {
-            background: #1e293b;
-            padding: 40px;
-            border-radius: 24px;
-            max-width: 450px;
-            width: 90%;
-            text-align: center;
-            border: 1px solid var(--primary);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
-
-        #modal h2 { color: #10b981; margin-top: 0; }
-        #modal p { line-height: 1.6; color: #cbd5e1; font-size: 1.1rem; }
-
-        button {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 12px;
-            font-weight: 700;
-            cursor: pointer;
+            border-radius: 4px;
+            cursor: grab;
+            font-weight: bold;
+            font-size: 0.9rem;
             transition: 0.2s;
         }
+        .skill-node:hover { background: var(--accent); color: #000; }
 
-        button:hover { transform: translateY(-2px); background: #4f46e5; }
+        .career-slot {
+            border: 2px dashed rgba(255,255,255,0.5);
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 8px;
+            min-height: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            pointer-events: auto;
+        }
+
+        .career-slot.drag-over { border-color: var(--accent); background: rgba(255, 204, 0, 0.1); }
+        .career-slot.filled { border: 2px solid var(--success); background: rgba(39, 174, 96, 0.2); color: var(--success); font-weight: bold; }
+
+        .sub-career { font-size: 0.7rem; opacity: 0.6; margin-top: 4px; pointer-events: none; }
+        .c-name { pointer-events: none; }
+
+        /* Success Message */
+        #success-pop {
+            display: none;
+            position: fixed;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: white; color: #333;
+            padding: 30px; border-radius: 15px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            z-index: 1000; text-align: center; width: 350px;
+        }
+
+        #success-pop button {
+            background: var(--blue-print); color: white; border: none;
+            padding: 10px 20px; border-radius: 5px; margin-top: 20px; cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>Career Quest: Tech Design</h1>
-    <div class="score-pill">MATCHED: <span id="score">0</span> / 8</div>
+    <h1>The Designer's Career Blueprint</h1>
+    <div class="counter">MATCHED: <span id="count">0</span> / 8</div>
 </header>
 
-<div class="container">
-    <div class="column" id="skills-list">
-        <div class="col-label">The Workshop (Skills)</div>
+<div class="blueprint-table">
+    <div class="col" id="skills-wrap">
+        <div class="col-title">Workshop & Studio Skills</div>
     </div>
-    <div class="column" id="targets-list">
-        <div class="col-label">The Industry (Careers)</div>
+    <div class="col" id="careers-wrap">
+        <div class="col-title">Industry Career Paths</div>
     </div>
 </div>
 
-<div id="modal">
-    <div class="modal-box">
-        <h2 id="m-title">Skill Unlocked!</h2>
-        <p id="m-desc"></p>
-        <button onclick="closeModal()">Next Match</button>
-    </div>
+<div id="success-pop">
+    <h2 style="color:var(--success)">Match Validated!</h2>
+    <p id="match-info"></p>
+    <button onclick="closePop()">Next Skill</button>
 </div>
 
 <script>
-    const quizData = [
-        { id: '1', s: '🪚 Bandsaw & Machine Safety', c: 'Industrial Fabricator', h: 'Heavy Machinery / Manufacturing', d: 'Mastering the shop floor! Safely shaping materials is the heart of custom manufacturing.' },
-        { id: '2', s: '🏠 Structural Framing & Joinery', c: 'Construction Lead', h: 'Trades / Civil Engineering', d: 'You built the skeleton! Understanding joints and framing ensures structures can handle weight and weather.' },
-        { id: '3', s: '📐 ISO & Orthographic Drawings', c: 'Mechanical Technologist', h: 'Engineering / Design', d: 'Universal language! Your 2D plans allow engineers to build your ideas exactly as you imagined.' },
-        { id: '4', s: '📦 Cardboard Prototyping', c: 'Product Concept Designer', h: 'Design / UX', d: 'Fail fast, learn fast! Low-cost cardboard models are used by giants like Nike and Apple to test ideas.' },
-        { id: '5', s: '💻 3D CAD Modeling', c: 'Digital Prototyper', h: 'Tech / Manufacturing', d: 'The digital twin! 3D models are the blueprint for everything from rocket parts to medical implants.' },
-        { id: '6', s: '📋 SPICE (The Design Process)', c: 'Project Manager', h: 'Management / Business', d: 'Process power! Using a logical workflow (SPICE) is how the worlds biggest projects stay on track.' },
-        { id: '7', s: '📏 Precision Measurement', c: 'Quality Control Inspector', h: 'Civil Tech / Aerospace', d: 'Measure twice, cut once. In the real world, being off by a millimeter can cost thousands!' },
-        { id: '8', s: '🎥 Video Research & Editing', c: 'Technical Media Producer', h: 'Communications', d: 'Tell the story! Documenting your build process is vital for patents, safety, and marketing.' }
+    const coreData = [
+        { id: 'a', s: 'Technical Sketching (ISO/Ortho)', c: 'Mechanical Technologist', p: 'Engineering', d: 'Visualizing 3D parts as 2D blueprints is the standard for global manufacturing.' },
+        { id: 'b', s: 'Framing & Structural Assembly', c: 'Project Superintendent', p: 'Construction', d: 'Understanding how raw materials join to form a skeleton is vital for managing massive builds.' },
+        { id: 'c', s: 'The Design Process (SPICE)', c: 'Systems Designer', p: 'Innovation / Tech', d: 'SPICE ensures you don\'t just build—you solve. Every great invention follows this logical loop.' },
+        { id: 'd', s: 'Machine Safety (Saws & Tools)', c: 'Model Maker / Fabricator', p: 'Industrial Arts', d: 'The ability to safely use heavy machinery to shape prototypes is a high-demand industry skill.' },
+        { id: 'e', s: 'Precision Measurement', c: 'Site Surveyor', p: 'Civil Engineering', d: 'If a design is off by a fraction, the build fails. Accuracy is the difference between a job and a career.' },
+        { id: 'f', s: '3D Printing & Digital Fab', c: 'Additive Mfg Specialist', p: 'High-Tech Mfg', d: 'Bridging the gap between a computer screen and a physical object is the future of production.' },
+        { id: 'g', s: 'Research & Video Documentation', c: 'Technical Media Lead', p: 'Communications', d: 'If you can\'t document the "how" and "why," the client won\'t understand the value of your work.' },
+        { id: 'h', s: 'Ergonomic & Cardboard Mockups', c: 'Usability Consultant', p: 'User Experience', d: 'Testing how things feel in a human hand (ergonomics) saves time before the real building starts.' }
     ];
 
-    let score = 0;
+    let matches = 0;
 
-    function init() {
-        const sCol = document.getElementById('skills-list');
-        const tCol = document.getElementById('targets-list');
+    function start() {
+        const sw = document.getElementById('skills-wrap');
+        const cw = document.getElementById('careers-wrap');
 
-        // Randomize skills
-        [...quizData].sort(() => Math.random() - 0.5).forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'skill-card';
-            div.draggable = true;
-            div.innerText = item.s;
-            div.id = `s-${item.id}`;
-            div.addEventListener('dragstart', e => e.dataTransfer.setData('text', e.target.id));
-            sCol.appendChild(div);
+        // Shuffle and Build
+        [...coreData].sort(() => Math.random() - 0.5).forEach(item => {
+            const node = document.createElement('div');
+            node.className = 'skill-node';
+            node.draggable = true;
+            node.innerText = item.s;
+            node.id = item.id;
+            node.addEventListener('dragstart', e => e.dataTransfer.setData('text', e.target.id));
+            sw.appendChild(node);
         });
 
-        // Randomize targets
-        [...quizData].sort(() => Math.random() - 0.5).forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'target-card';
-            div.dataset.match = `s-${item.id}`;
-            div.innerHTML = `<div class="job-name">${item.c}</div><div class="job-hint">Field: ${item.h}</div>`;
-            div.addEventListener('dragover', e => e.preventDefault());
-            div.addEventListener('dragenter', () => div.classList.add('hover'));
-            div.addEventListener('dragleave', () => div.classList.remove('hover'));
-            div.addEventListener('drop', handleDrop);
-            tCol.appendChild(div);
+        [...coreData].sort(() => Math.random() - 0.5).forEach(item => {
+            const slot = document.createElement('div');
+            slot.className = 'career-slot';
+            slot.dataset.match = item.id;
+            slot.innerHTML = `<div class="c-name">${item.c}</div><div class="sub-career">Field: ${item.p}</div>`;
+            
+            slot.addEventListener('dragover', e => e.preventDefault());
+            slot.addEventListener('dragenter', e => slot.classList.add('drag-over'));
+            slot.addEventListener('dragleave', e => slot.classList.remove('drag-over'));
+            slot.addEventListener('drop', handleDrop);
+            cw.appendChild(slot);
         });
     }
 
     function handleDrop(e) {
         e.preventDefault();
         const slot = e.currentTarget;
-        slot.classList.remove('hover');
-        const draggedId = e.dataTransfer.getData('text');
-
-        if (slot.dataset.match === draggedId) {
-            slot.classList.add('correct');
-            const matchData = quizData.find(d => `s-${d.id}` === draggedId);
-            document.getElementById(draggedId).style.display = 'none';
-            document.getElementById('m-desc').innerText = matchData.d;
-            document.getElementById('modal').style.display = 'flex';
-            score++;
-            document.getElementById('score').innerText = score;
-            
-            if (score === quizData.length) {
-                document.getElementById('m-title').innerText = "🏆 Mastery Achieved!";
-                document.getElementById('m-desc').innerText = "You've successfully mapped your classroom workshop skills to professional industry careers!";
-            }
+        slot.classList.remove('drag-over');
+        const skillId = e.dataTransfer.getData('text');
+        
+        if (slot.dataset.match === skillId) {
+            const data = coreData.find(d => d.id === skillId);
+            slot.classList.add('filled');
+            slot.innerText = "MATCHED: " + data.s;
+            document.getElementById(skillId).style.display = 'none';
+            document.getElementById('match-info').innerText = data.d;
+            document.getElementById('success-pop').style.display = 'block';
+            matches++;
+            document.getElementById('count').innerText = matches;
         } else {
-            // No alert - just shake or let them try again for a "smoother" feel
-            const draggedElem = document.getElementById(draggedId);
-            draggedElem.style.border = "1px solid var(--accent)";
-            setTimeout(() => draggedElem.style.border = "1px solid rgba(255,255,255,0.1)", 500);
+            // Simplified error - just a visual shake or alert
+            slot.style.borderColor = 'red';
+            setTimeout(() => slot.style.borderColor = 'rgba(255,255,255,0.5)', 500);
         }
     }
 
-    function closeModal() { document.getElementById('modal').style.display = 'none'; }
-    init();
+    function closePop() { document.getElementById('success-pop').style.display = 'none'; }
+    start();
 </script>
 </body>
 </html>
