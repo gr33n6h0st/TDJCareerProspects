@@ -3,22 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TDJ: The Career Blueprint</title>
+    <title>TDJ Career Matcher</title>
     <style>
         :root {
-            --blue-print: #004a99;
-            --paper: #f0f4f8;
-            --accent: #ffcc00;
-            --success: #27ae60;
-            --text: #ffffff;
+            --bg: #f8fafc;
+            --dark: #0f172a;
+            --accent: #6366f1;
+            --success: #10b981;
+            --error: #ef4444;
         }
 
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background-color: var(--blue-print);
-            background-image: radial-gradient(#ffffff22 1px, transparent 1px);
-            background-size: 20px 20px;
-            color: var(--text);
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--dark);
             margin: 0;
             height: 100vh;
             display: flex;
@@ -27,167 +25,181 @@
         }
 
         header {
-            text-align: center;
+            background: var(--dark);
+            color: white;
             padding: 20px;
-            border-bottom: 2px solid #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
 
-        h1 { margin: 0; text-transform: uppercase; letter-spacing: 3px; font-size: 1.5rem; }
-        .counter { font-weight: bold; color: var(--accent); margin-top: 5px; }
+        h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; }
+        .score-display { background: var(--accent); padding: 5px 15px; border-radius: 20px; font-weight: bold; }
 
-        .blueprint-table {
+        .main-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            padding: 30px;
-            max-width: 1100px;
+            grid-template-columns: 350px 1fr;
+            gap: 40px;
+            padding: 40px;
+            max-width: 1200px;
             margin: 0 auto;
-            flex: 1;
             width: 100%;
+            flex: 1;
             box-sizing: border-box;
         }
 
-        .col { display: flex; flex-direction: column; gap: 10px; }
-        .col-title { font-size: 0.8rem; opacity: 0.7; text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid #fff; }
+        .column { display: flex; flex-direction: column; gap: 15px; }
+        .section-label { font-size: 0.8rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
 
-        .skill-node {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid #fff;
-            padding: 15px;
-            border-radius: 4px;
+        .skill-box {
+            background: white;
+            padding: 18px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
             cursor: grab;
-            font-weight: bold;
-            font-size: 0.9rem;
-            transition: 0.2s;
+            font-weight: 600;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            transition: all 0.2s;
         }
-        .skill-node:hover { background: var(--accent); color: #000; }
+        .skill-box:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .skill-box:active { cursor: grabbing; }
 
-        .career-slot {
-            border: 2px dashed rgba(255,255,255,0.5);
-            background: rgba(0,0,0,0.2);
-            padding: 15px;
-            border-radius: 8px;
-            min-height: 50px;
+        .career-card {
+            background: white;
+            border: 2px dashed #cbd5e1;
+            padding: 20px;
+            border-radius: 16px;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            align-items: center;
-            text-align: center;
-            pointer-events: auto;
+            min-height: 80px;
+            transition: all 0.3s;
+            position: relative;
         }
 
-        .career-slot.drag-over { border-color: var(--accent); background: rgba(255, 204, 0, 0.1); }
-        .career-slot.filled { border: 2px solid var(--success); background: rgba(39, 174, 96, 0.2); color: var(--success); font-weight: bold; }
+        .career-card.hover { border-color: var(--accent); background: #f5f3ff; }
+        .career-card.correct { border: 2px solid var(--success); background: #f0fdf4; color: var(--success); border-style: solid; }
 
-        .sub-career { font-size: 0.7rem; opacity: 0.6; margin-top: 4px; pointer-events: none; }
-        .c-name { pointer-events: none; }
+        .career-name { font-weight: 800; font-size: 1.1rem; margin-bottom: 4px; }
+        .career-field { font-size: 0.8rem; font-weight: 600; color: #64748b; }
 
-        /* Success Message */
-        #success-pop {
+        /* Success Pop-up */
+        #popup {
             display: none;
             position: fixed;
             top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: white; color: #333;
-            padding: 30px; border-radius: 15px;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            z-index: 1000; text-align: center; width: 350px;
+            background: white;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            z-index: 100;
+            text-align: center;
+            max-width: 400px;
+            border: 4px solid var(--success);
         }
 
-        #success-pop button {
-            background: var(--blue-print); color: white; border: none;
-            padding: 10px 20px; border-radius: 5px; margin-top: 20px; cursor: pointer;
-        }
+        #popup h2 { margin-top: 0; color: var(--success); }
+        #popup button { background: var(--dark); color: white; border: none; padding: 12px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 90; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>The Designer's Career Blueprint</h1>
-    <div class="counter">MATCHED: <span id="count">0</span> / 8</div>
+    <h1>TDJ Career Dashboard</h1>
+    <div class="score-display">MATCHED: <span id="score">0</span> / 8</div>
 </header>
 
-<div class="blueprint-table">
-    <div class="col" id="skills-wrap">
-        <div class="col-title">Workshop & Studio Skills</div>
-    </div>
-    <div class="col" id="careers-wrap">
-        <div class="col-title">Industry Career Paths</div>
-    </div>
+<div class="main-grid">
+    <div class="column" id="skills-list">
+        <div class="section-label">Your Classroom Skills</div>
+        </div>
+
+    <div class="column" id="careers-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div class="section-label" style="grid-column: span 2;">Industry Target Careers</div>
+        </div>
 </div>
 
-<div id="success-pop">
-    <h2 style="color:var(--success)">Match Validated!</h2>
-    <p id="match-info"></p>
-    <button onclick="closePop()">Next Skill</button>
+<div class="overlay" id="overlay"></div>
+<div id="popup">
+    <h2 id="p-title">Match!</h2>
+    <p id="p-desc"></p>
+    <button onclick="closePopup()">Continue</button>
 </div>
 
 <script>
-    const coreData = [
-        { id: 'a', s: 'Technical Sketching (ISO/Ortho)', c: 'Mechanical Technologist', p: 'Engineering', d: 'Visualizing 3D parts as 2D blueprints is the standard for global manufacturing.' },
-        { id: 'b', s: 'Framing & Structural Assembly', c: 'Project Superintendent', p: 'Construction', d: 'Understanding how raw materials join to form a skeleton is vital for managing massive builds.' },
-        { id: 'c', s: 'The Design Process (SPICE)', c: 'Systems Designer', p: 'Innovation / Tech', d: 'SPICE ensures you don\'t just build—you solve. Every great invention follows this logical loop.' },
-        { id: 'd', s: 'Machine Safety (Saws & Tools)', c: 'Model Maker / Fabricator', p: 'Industrial Arts', d: 'The ability to safely use heavy machinery to shape prototypes is a high-demand industry skill.' },
-        { id: 'e', s: 'Precision Measurement', c: 'Site Surveyor', p: 'Civil Engineering', d: 'If a design is off by a fraction, the build fails. Accuracy is the difference between a job and a career.' },
-        { id: 'f', s: '3D Printing & Digital Fab', c: 'Additive Mfg Specialist', p: 'High-Tech Mfg', d: 'Bridging the gap between a computer screen and a physical object is the future of production.' },
-        { id: 'g', s: 'Research & Video Documentation', c: 'Technical Media Lead', p: 'Communications', d: 'If you can\'t document the "how" and "why," the client won\'t understand the value of your work.' },
-        { id: 'h', s: 'Ergonomic & Cardboard Mockups', c: 'Usability Consultant', p: 'User Experience', d: 'Testing how things feel in a human hand (ergonomics) saves time before the real building starts.' }
+    const data = [
+        { id: '1', s: 'Isometric & Orthographic Sketching', c: 'Mechanical Technologist', f: 'Manufacturing', d: 'Standardized drawings are the blueprint for building complex machines across the world.' },
+        { id: '2', s: 'Machine Tool Safety (Bandsaws/Saws)', c: 'Industrial Fabricator', f: 'Trades / Prototype', d: 'Safely shaping wood and metal into specific forms is a high-demand industry skill.' },
+        { id: '3', s: 'Framing & Structural Assembly', c: 'Project Superintendent', f: 'Construction', d: 'Understanding how joints and skeletons hold loads is essential for managing building sites.' },
+        { id: '4', s: '3D Printing & Digital Fab', c: 'Rapid Prototyper', f: 'Tech & Aerospace', d: 'You bridge the gap between a 3D computer model and a physical object you can hold.' },
+        { id: '5', s: 'Precision Measurement', c: 'Quality Control Lead', f: 'Civil Engineering', d: 'Being accurate to the millimeter prevents massive financial losses during a build.' },
+        { id: '6', s: 'The Design Process (SPICE)', c: 'Product Designer', f: 'Innovation', d: 'The SPICE loop is the same workflow used by the world’s most successful design agencies.' },
+        { id: '7', s: 'Video & Media Documentation', c: 'Technical Media Lead', f: 'Communications', d: 'If you can’t show how a product works, the user will never understand its value.' },
+        { id: '8', s: 'Cardboard & Ergonomic Mockups', c: 'Usability Consultant', f: 'UX / Product Design', d: 'Mocking up ideas in cardboard tests if a design is comfortable for humans before building the real thing.' }
     ];
 
-    let matches = 0;
+    let score = 0;
 
-    function start() {
-        const sw = document.getElementById('skills-wrap');
-        const cw = document.getElementById('careers-wrap');
+    function setup() {
+        const sContainer = document.getElementById('skills-list');
+        const cContainer = document.getElementById('careers-list');
 
-        // Shuffle and Build
-        [...coreData].sort(() => Math.random() - 0.5).forEach(item => {
-            const node = document.createElement('div');
-            node.className = 'skill-node';
-            node.draggable = true;
-            node.innerText = item.s;
-            node.id = item.id;
-            node.addEventListener('dragstart', e => e.dataTransfer.setData('text', e.target.id));
-            sw.appendChild(node);
+        [...data].sort(() => Math.random() - 0.5).forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'skill-box';
+            div.draggable = true;
+            div.innerText = item.s;
+            div.id = `skill-${item.id}`;
+            div.addEventListener('dragstart', (e) => e.dataTransfer.setData('text', e.target.id));
+            sContainer.appendChild(div);
         });
 
-        [...coreData].sort(() => Math.random() - 0.5).forEach(item => {
-            const slot = document.createElement('div');
-            slot.className = 'career-slot';
-            slot.dataset.match = item.id;
-            slot.innerHTML = `<div class="c-name">${item.c}</div><div class="sub-career">Field: ${item.p}</div>`;
+        [...data].sort(() => Math.random() - 0.5).forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'career-card';
+            div.dataset.match = `skill-${item.id}`;
+            div.innerHTML = `<div class="career-name">${item.c}</div><div class="career-field">Field: ${item.f}</div>`;
             
-            slot.addEventListener('dragover', e => e.preventDefault());
-            slot.addEventListener('dragenter', e => slot.classList.add('drag-over'));
-            slot.addEventListener('dragleave', e => slot.classList.remove('drag-over'));
-            slot.addEventListener('drop', handleDrop);
-            cw.appendChild(slot);
+            div.addEventListener('dragover', (e) => e.preventDefault());
+            div.addEventListener('dragenter', () => div.classList.add('hover'));
+            div.addEventListener('dragleave', () => div.classList.remove('hover'));
+            div.addEventListener('drop', handleDrop);
+            cContainer.appendChild(div);
         });
     }
 
     function handleDrop(e) {
         e.preventDefault();
-        const slot = e.currentTarget;
-        slot.classList.remove('drag-over');
+        const card = e.currentTarget;
+        card.classList.remove('hover');
         const skillId = e.dataTransfer.getData('text');
-        
-        if (slot.dataset.match === skillId) {
-            const data = coreData.find(d => d.id === skillId);
-            slot.classList.add('filled');
-            slot.innerText = "MATCHED: " + data.s;
+
+        if (card.dataset.match === skillId) {
+            const match = data.find(d => `skill-${d.id}` === skillId);
+            card.classList.add('correct');
+            card.innerHTML = `<div class="career-name">✓ ${match.c}</div><div class="career-field">${match.s}</div>`;
             document.getElementById(skillId).style.display = 'none';
-            document.getElementById('match-info').innerText = data.d;
-            document.getElementById('success-pop').style.display = 'block';
-            matches++;
-            document.getElementById('count').innerText = matches;
+            
+            document.getElementById('p-desc').innerText = match.d;
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('popup').style.display = 'block';
+            
+            score++;
+            document.getElementById('score').innerText = score;
         } else {
-            // Simplified error - just a visual shake or alert
-            slot.style.borderColor = 'red';
-            setTimeout(() => slot.style.borderColor = 'rgba(255,255,255,0.5)', 500);
+            alert("Incorrect pairing. Think about how that specific shop skill applies to the field.");
         }
     }
 
-    function closePop() { document.getElementById('success-pop').style.display = 'none'; }
-    start();
+    function closePopup() {
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('popup').style.display = 'none';
+    }
+
+    setup();
 </script>
 </body>
 </html>
