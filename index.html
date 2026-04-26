@@ -1,305 +1,190 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tech Design: Career Matrix 2025</title>
+    <title>TDJ Skills to Career Mapper</title>
     <style>
         :root {
-            --bg: #0f172a;
-            --card-bg: #1e293b;
-            --text: #f1f5f9;
-            --accent: #38bdf8;
-            --success: #22c55e;
-            --error: #ef4444;
-            --skill-bg: #334155;
+            --bg: #121212;
+            --panel: #1e1e1e;
+            --accent: #00d4ff;
+            --text: #e0e0e0;
+            --success: #00ff88;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--bg);
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg);
             color: var(--text);
             margin: 0;
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 40px 20px;
+            overflow: hidden; /* Prevents scrolling */
         }
 
         header {
             text-align: center;
-            margin-bottom: 40px;
+            padding: 15px;
+            background: var(--panel);
+            border-bottom: 2px solid #333;
         }
 
-        h1 {
-            font-size: 2.5rem;
-            letter-spacing: -0.025em;
-            margin-bottom: 10px;
-            background: linear-gradient(to right, #38bdf8, #818cf8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        h1 { margin: 0; font-size: 1.4rem; color: var(--accent); }
+        p { margin: 5px 0 0; font-size: 0.9rem; opacity: 0.7; }
 
-        .stats-bar {
-            position: sticky;
-            top: 20px;
-            z-index: 100;
-            background: var(--card-bg);
-            padding: 15px 30px;
-            border-radius: 50px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255,255,255,0.1);
-            font-weight: 600;
-            margin-bottom: 30px;
-            display: flex;
-            gap: 20px;
-        }
-
-        .container {
+        .game-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 40px;
+            gap: 20px;
+            padding: 20px;
+            flex: 1;
+            max-width: 1000px;
+            margin: 0 auto;
             width: 100%;
-            max-width: 1100px;
+            box-sizing: border-box;
         }
 
         .column {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
 
-        .col-header {
-            font-size: 0.8rem;
+        .label {
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: #94a3b8;
-            margin-bottom: 8px;
-            padding-left: 10px;
+            letter-spacing: 1px;
+            color: var(--accent);
+            margin-bottom: 5px;
         }
 
-        .skill-item {
-            background: var(--skill-bg);
-            padding: 16px;
-            border-radius: 12px;
+        .draggable {
+            background: #333;
+            padding: 12px;
+            border-radius: 6px;
             cursor: grab;
-            border: 1px solid rgba(255,255,255,0.05);
-            transition: all 0.2s;
-            font-size: 0.95rem;
-            font-weight: 500;
+            font-weight: 600;
+            border: 1px solid #444;
+            font-size: 0.9rem;
+            text-align: center;
+            transition: 0.2s;
         }
 
-        .skill-item:hover {
-            transform: translateX(5px);
-            background: #475569;
-            border-color: var(--accent);
-        }
+        .draggable:hover { border-color: var(--accent); background: #3d3d3d; }
 
-        .skill-item:active { cursor: grabbing; }
-
-        .career-slot {
-            background: var(--card-bg);
-            border: 2px dashed #475569;
-            padding: 20px;
-            border-radius: 16px;
-            min-height: 80px;
+        .drop-zone {
+            background: var(--panel);
+            border: 2px dashed #444;
+            border-radius: 8px;
+            padding: 10px;
+            min-height: 50px;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            transition: all 0.3s;
+            align-items: center;
+            text-align: center;
+            transition: 0.3s;
         }
 
-        .career-title {
-            font-weight: 700;
-            color: var(--accent);
-            margin-bottom: 4px;
-        }
+        .career-name { font-weight: bold; font-size: 0.95rem; }
+        .parent-field { font-size: 0.75rem; opacity: 0.6; margin-top: 2px; }
 
-        .sub-tag {
-            font-size: 0.75rem;
-            color: #64748b;
-            font-style: italic;
-        }
+        .drop-zone.hover { border-color: var(--accent); background: #252525; }
+        .drop-zone.matched { border: 2px solid var(--success); background: rgba(0, 255, 136, 0.1); color: var(--success); }
 
-        .career-slot.drag-over {
-            border-color: var(--accent);
-            background: rgba(56, 189, 248, 0.05);
-        }
-
-        .career-slot.correct {
-            border-style: solid;
-            border-color: var(--success);
-            background: rgba(34, 197, 94, 0.1);
-        }
-
-        /* Modal / Pop-up */
-        .modal-overlay {
+        /* Pop up overlay */
+        #overlay {
             display: none;
             position: fixed;
-            top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(4px);
-            z-index: 1000;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
             justify-content: center;
             align-items: center;
+            z-index: 100;
         }
 
         .modal {
-            background: var(--card-bg);
-            padding: 40px;
-            border-radius: 24px;
-            max-width: 500px;
-            width: 90%;
+            background: #252525;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 400px;
             text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            border: 1px solid var(--accent);
         }
 
-        .modal h2 { color: var(--success); margin-top: 0; }
-        .modal p { line-height: 1.6; color: #cbd5e1; }
-        .modal button {
+        button {
             background: var(--accent);
-            color: var(--bg);
             border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-weight: 700;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: bold;
             cursor: pointer;
-            margin-top: 20px;
-        }
-
-        @media (max-width: 768px) {
-            .container { grid-template-columns: 1fr; }
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>Career Logic Matrix</h1>
-    <p>Match the high-level design skill to its 2025 specialized career path.</p>
+    <h1>Technological Design: Skill Mapper</h1>
+    <p>Match the TDJ classroom skill to the professional career path.</p>
 </header>
 
-<div class="stats-bar">
-    <div>Score: <span id="score">0</span> / 8</div>
-    <div style="color: #64748b">|</div>
-    <div id="status">Drag a skill to begin</div>
+<div class="game-container">
+    <div class="column" id="skills-col">
+        <div class="label">TDJ Classroom Skills</div>
+        </div>
+
+    <div class="column" id="careers-col">
+        <div class="label">Professional Careers</div>
+        </div>
 </div>
 
-<div class="container">
-    <div class="column" id="skills-container">
-        <div class="col-header">Available Skills</div>
-        <!-- Skills generated by JS -->
-    </div>
-
-    <div class="column" id="careers-container">
-        <div class="col-header">Target Careers</div>
-        <!-- Careers generated by JS -->
-    </div>
-</div>
-
-<div class="modal-overlay" id="modalOverlay">
+<div id="overlay">
     <div class="modal">
-        <h2 id="modalTitle">Correct!</h2>
-        <p id="modalDesc"></p>
-        <button onclick="closeModal()">Next Challenge</button>
+        <h2 style="color:var(--success)">Match Confirmed!</h2>
+        <p id="descText"></p>
+        <button onclick="closeModal()">Next Match</button>
     </div>
 </div>
 
 <script>
-    const data = [
-        {
-            id: "s1",
-            skill: "Parametric & Generative Modeling",
-            career: "Computational Designer",
-            subOf: "Mechanical Engineering / Architecture",
-            desc: "Computational designers don't draw shapes; they write algorithms that generate thousands of optimized parts based on weight and strength."
-        },
-        {
-            id: "s2",
-            skill: "BIM (Building Information Modeling)",
-            career: "VDC Coordinator",
-            subOf: "Construction Management",
-            desc: "Virtual Design and Construction (VDC) uses 3D data to simulate a building's entire lifecycle before ground is even broken."
-        },
-        {
-            id: "s3",
-            skill: "Human-Machine Interaction (HMI)",
-            career: "Industrial UI Designer",
-            subOf: "Industrial Design",
-            desc: "As machines get smarter, we need designers to create the touchscreens and controls that make complex robotics feel natural to humans."
-        },
-        {
-            id: "s4",
-            skill: "Rapid Prototyping & DfAM",
-            career: "Additive Manufacturing Lead",
-            subOf: "Manufacturing Engineering",
-            desc: "Design for Additive Manufacturing (DfAM) focuses specifically on 3D printing complex geometries that are impossible to make any other way."
-        },
-        {
-            id: "s5",
-            skill: "Life Cycle Assessment (LCA)",
-            career: "Sustainability Consultant",
-            subOf: "Architectural / Industrial Design",
-            desc: "Modern designers must calculate the total carbon footprint of every material, from extraction to disposal."
-        },
-        {
-            id: "s6",
-            skill: "Mechatronics Systems Logic",
-            career: "Robotics Integration Tech",
-            subOf: "Robotics & Control Design",
-            desc: "This role bridges the gap between mechanical hardware and software code to ensure automated factory lines work flawlessly."
-        },
-        {
-            id: "s7",
-            skill: "Kinetic Architecture Principles",
-            career: "Adaptive Reuse Architect",
-            subOf: "Architecture",
-            desc: "Designing buildings that can physically move or change shape to respond to weather or user needs."
-        },
-        {
-            id: "s8",
-            skill: "Ergonomic Data Analysis",
-            career: "Human Factors Engineer",
-            subOf: "Industrial Design / Health Tech",
-            desc: "Using body measurements and cognitive data to design cockpits, surgical tools, and workstations that prevent injury."
-        }
+    const mapping = [
+        { id: '1', skill: 'Technical Sketching', career: 'Concept Artist', field: 'Industrial Design', info: 'Hand sketching is the first step in communicating ideas before they ever reach a computer.' },
+        { id: '2', skill: '3D CAD Modeling', career: 'Mechanical Technologist', field: 'Engineering', info: 'Turning 2D ideas into 3D digital parts is core to modern manufacturing and robotics.' },
+        { id: '3', skill: 'Architectural Drafting', career: 'Urban Planner', field: 'Architecture', info: 'Understanding floor plans and site layouts helps in designing how cities and buildings function.' },
+        { id: '4', skill: 'The Design Process', career: 'Project Coordinator', field: 'Business & Tech', info: 'The SPICE (Situation, Problem, Ideas, Choice, Evaluation) process is used in almost every management job.' },
+        { id: '5', skill: 'Physical Model Building', career: 'Industrial Designer', field: 'Product Design', info: 'Building scale models helps test ergonomics—how a product actually feels in a human hand.' },
+        { id: '6', skill: 'Technical Reporting', career: 'Technical Writer', field: 'Communications', info: 'Explaining how a design works in writing is essential for safety manuals and patent filings.' }
     ];
 
-    let score = 0;
-    const skillsCol = document.getElementById('skills-container');
-    const careersCol = document.getElementById('careers-container');
-
-    // Shuffle helper
-    const shuffle = (array) => array.sort(() => Math.random() - 0.5);
-
     function init() {
-        // Create shuffled skills
-        shuffle([...data]).forEach(item => {
+        const skillsCol = document.getElementById('skills-col');
+        const careersCol = document.getElementById('careers-col');
+
+        // Shuffle skills
+        [...mapping].sort(() => Math.random() - 0.5).forEach(item => {
             const div = document.createElement('div');
-            div.className = 'skill-item';
+            div.className = 'draggable';
             div.draggable = true;
             div.innerText = item.skill;
-            div.id = item.id;
-            div.addEventListener('dragstart', e => e.dataTransfer.setData('text', e.target.id));
+            div.id = `skill-${item.id}`;
+            div.addEventListener('dragstart', (e) => e.dataTransfer.setData('text', e.target.id));
             skillsCol.appendChild(div);
         });
 
-        // Create shuffled career slots
-        shuffle([...data]).forEach(item => {
+        // Shuffle careers
+        [...mapping].sort(() => Math.random() - 0.5).forEach(item => {
             const div = document.createElement('div');
-            div.className = 'career-slot';
-            div.dataset.match = item.id;
-            div.innerHTML = `
-                <div class="career-title">${item.career}</div>
-                <div class="sub-tag">Sub-career of: ${item.subOf}</div>
-            `;
+            div.className = 'drop-zone';
+            div.dataset.match = `skill-${item.id}`;
+            div.innerHTML = `<div class="career-name">${item.career}</div><div class="parent-field">Field: ${item.field}</div>`;
             
-            div.addEventListener('dragover', e => e.preventDefault());
-            div.addEventListener('dragenter', e => e.target.closest('.career-slot').classList.add('drag-over'));
-            div.addEventListener('dragleave', e => e.target.closest('.career-slot').classList.remove('drag-over'));
+            div.addEventListener('dragover', (e) => e.preventDefault());
+            div.addEventListener('dragenter', (e) => div.classList.add('hover'));
+            div.addEventListener('dragleave', (e) => div.classList.remove('hover'));
             div.addEventListener('drop', handleDrop);
             
             careersCol.appendChild(div);
@@ -308,43 +193,26 @@
 
     function handleDrop(e) {
         e.preventDefault();
-        const slot = e.target.closest('.career-slot');
-        slot.classList.remove('drag-over');
-        const skillId = e.dataTransfer.getData('text');
-        
-        if (slot.dataset.match === skillId) {
-            const itemData = data.find(d => d.id === skillId);
-            slot.classList.add('correct');
-            slot.innerHTML += `<div style="font-size:0.85rem; color:#22c55e; margin-top:8px;">✓ Linked to ${itemData.skill}</div>`;
-            document.getElementById(skillId).style.display = 'none';
-            
-            score++;
-            document.getElementById('score').innerText = score;
-            showModal(itemData);
-            
-            if (score === data.length) {
-                document.getElementById('status').innerText = "All Careers Mapped! Well done.";
-            }
+        const zone = e.currentTarget;
+        zone.classList.remove('hover');
+        const draggedId = e.dataTransfer.getData('text');
+
+        if (zone.dataset.match === draggedId) {
+            zone.classList.add('matched');
+            const data = mapping.find(m => `skill-${m.id}` === draggedId);
+            document.getElementById(draggedId).style.visibility = 'hidden';
+            document.getElementById('descText').innerText = data.info;
+            document.getElementById('overlay').style.display = 'flex';
         } else {
-            document.getElementById('status').innerText = "Incorrect pairing. Try again!";
-            document.getElementById('status').style.color = 'var(--error)';
-            setTimeout(() => {
-                document.getElementById('status').style.color = '#64748b';
-            }, 1000);
+            alert("Pairing incorrect. Look at the 'Field' for a hint!");
         }
     }
 
-    function showModal(item) {
-        document.getElementById('modalDesc').innerText = item.desc;
-        document.getElementById('modalOverlay').style.display = 'flex';
-    }
-
     function closeModal() {
-        document.getElementById('modalOverlay').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
     }
 
     init();
 </script>
-
 </body>
 </html>
