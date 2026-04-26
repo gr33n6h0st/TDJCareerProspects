@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BCSS Tech Design: Skills Matcher</title>
+    <style>
+        :root {
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+            header { text-align: center; margin-bottom: 30px; }
+            .score-board { font-size: 1.5rem; font-weight: bold; background: #2c3e50; color: white; padding: 10px 20px; border-radius: 8px; margin-bottom: 20px; }
+            .container { display: flex; gap: 50px; width: 100%; max-width: 900px; justify-content: center; }
+            .column { flex: 1; display: flex; flex-direction: column; gap: 15px; }
+            .skill { background: #3498db; color: white; padding: 15px; border-radius: 5px; cursor: grab; text-align: center; font-weight: bold; transition: transform 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+            .skill:active { cursor: grabbing; }
+            .career { border: 3px dashed #bdc3c7; background: #fff; padding: 20px; border-radius: 10px; min-height: 60px; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: bold; position: relative; }
+            .career.over { border-color: #2ecc71; background: #e8f8f5; }
+            .career.matched { border: 3px solid #2ecc71; background: #d4efdf; color: #1b5e20; cursor: default; }
+            #message-overlay { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 15px; box-shadow: 0 0 20px rgba(0,0,0,0.3); z-index: 10; text-align: center; max-width: 400px; }
+            .overlay-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 5; }
+            button { margin-top: 15px; padding: 10px 20px; background: #2c3e50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Brampton Centennial S.S.</h1>
+        <h3>Technological Design Skills Matcher</h3>
+    </header>
+
+    <div class="score-board">Score: <span id="score">0</span> / 5</div>
+
+    <div class="container">
+        <div class="column" id="skills-list">
+            <div class="skill" draggable="true" id="skill1" data-match="career1">Drafting & CAD</div>
+            <div class="skill" draggable="true" id="skill2" data-match="career2">Problem Solving & Logic</div>
+            <div class="skill" draggable="true" id="skill3" data-match="career3">Multi-disciplinary Teams</div>
+            <div class="skill" draggable="true" id="skill4" data-match="career4">Project Management</div>
+            <div class="skill" draggable="true" id="skill5" data-match="career5">Design Thinking/Usability</div>
+        </div>
+
+        <div class="column">
+            <div class="career" id="career1" data-id="career1">Architectural Drafter</div>
+            <div class="career" id="career2" data-id="career2">Engineering Specialist</div>
+            <div class="career" id="career3" data-id="career3">Large-Scale Project Lead</div>
+            <div class="career" id="career4" data-id="career4">Construction Manager</div>
+            <div class="career" id="career5" data-id="career5">Usability Architect</div>
+        </div>
+    </div>
+
+    <div class="overlay-bg" id="bg"></div>
+    <div id="message-overlay">
+        <h2 id="msg-title">Correct!</h2>
+        <p id="msg-body"></p>
+        <button onclick="closeMsg()">Keep Going</button>
+    </div>
+
+    <script>
+        let score = 0;
+        const explanations = {
+            career1: "Drafting & CAD are the backbone of Architecture. You need technical precision to create blueprints that meet Ontario building codes.",
+            career2: "Engineering requires logical breakdown of systems. If you can solve a design logic puzzle, you can optimize robotic workflows.",
+            career3: "Large projects require coordinating different departments (Electrical, Mechanical, Aesthetic). Team experience is vital here.",
+            career4: "Construction management is all about timelines and resources. Presentation and Project Management skills keep the site running.",
+            career5: "Usability Architects focus on how humans interact with products. Design thinking helps you bridge the gap between a machine and a person."
+        };
+
+        const skills = document.querySelectorAll('.skill');
+        const careers = document.querySelectorAll('.career');
+
+        skills.forEach(skill => {
+            skill.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text', e.target.id);
+            });
+        });
+
+        careers.forEach(career => {
+            career.addEventListener('dragover', (e) => e.preventDefault());
+            career.addEventListener('dragenter', (e) => e.target.classList.add('over'));
+            career.addEventListener('dragleave', (e) => e.target.classList.remove('over'));
+            
+            career.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.target.classList.remove('over');
+                const skillId = e.dataTransfer.getData('text');
+                const skillElem = document.getElementById(skillId);
+                
+                if (skillElem.getAttribute('data-match') === e.target.getAttribute('data-id')) {
+                    // Correct Match
+                    e.target.classList.add('matched');
+                    e.target.innerText = "MATCHED: " + skillElem.innerText;
+                    skillElem.style.visibility = 'hidden';
+                    showMsg(e.target.getAttribute('data-id'));
+                    updateScore();
+                } else {
+                    alert("Not quite! Think about how that skill is used in the workplace.");
+                }
+            });
+        });
+
+        function showMsg(id) {
+            document.getElementById('msg-body').innerText = explanations[id];
+            document.getElementById('message-overlay').style.display = 'block';
+            document.getElementById('bg').style.display = 'block';
+        }
+
+        function closeMsg() {
+            document.getElementById('message-overlay').style.display = 'none';
+            document.getElementById('bg').style.display = 'none';
+        }
+
+        function updateScore() {
+            score++;
+            document.getElementById('score').innerText = score;
+            if(score === 5) {
+                document.getElementById('msg-title').innerText = "Mission Accomplished!";
+                document.getElementById('msg-body').innerText = "You've successfully mapped BCSS design skills to real-world careers!";
+                showMsg();
+            }
+        }
+    </script>
+</body>
+</html>
