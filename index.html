@@ -7,170 +7,201 @@
     <style>
         :root {
             --bg: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --accent: #6366f1;
+            --card-bg: #1e293b;
+            --accent: #38bdf8;
             --text: #f8fafc;
             --success: #10b981;
-            --border: rgba(255, 255, 255, 0.1);
+            --error: #ef4444;
+            --border: rgba(255, 255, 255, 0.15);
         }
 
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: 'Inter', system-ui, sans-serif;
             background: #020617;
             color: var(--text);
             margin: 0;
-            overflow-x: hidden;
-            min-height: 100vh;
+            height: 100vh; /* Forces body to viewport height */
+            overflow: hidden; /* Prevents scrolling entirely */
+            display: flex;
+            flex-direction: column;
         }
 
         header {
-            padding: 30px;
+            padding: 15px 30px;
             text-align: center;
             border-bottom: 1px solid var(--border);
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(10px);
+            background: rgba(15, 23, 42, 0.95);
+            flex-shrink: 0;
         }
 
-        h1 { margin: 0; font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px; }
-        .sub-header { color: #94a3b8; font-size: 0.9rem; margin-top: 5px; text-transform: uppercase; letter-spacing: 2px; }
+        h1 { margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; }
+        .sub-header { color: #94a3b8; font-size: 0.8rem; margin-top: 4px; text-transform: uppercase; letter-spacing: 2px; }
 
         /* PATHWAY HUB */
         #hub-page {
-            max-width: 1200px;
-            margin: 40px auto;
+            max-width: 1100px;
+            margin: 0 auto;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            padding: 0 20px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding: 30px 20px;
+            flex-grow: 1;
+            align-content: center;
         }
 
         .category-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
-            padding: 30px;
-            border-radius: 16px;
+            padding: 25px 20px;
+            border-radius: 12px;
             cursor: pointer;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
+            text-align: center;
+            transition: 0.2s ease-in-out;
         }
 
         .category-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-4px);
             border-color: var(--accent);
-            background: rgba(30, 41, 59, 0.9);
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+            background: #27354d;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
         }
 
-        .category-card h2 { margin: 0 0 10px; font-size: 1.2rem; }
-        .category-card p { margin: 0; font-size: 0.85rem; opacity: 0.6; line-height: 1.5; }
+        .category-card h2 { margin: 0 0 8px; font-size: 1.1rem; color: var(--accent); }
+        .category-card p { margin: 0; font-size: 0.8rem; color: #cbd5e1; line-height: 1.4; }
 
         /* CHALLENGE WORKSPACE */
         #challenge-page {
             display: none;
             flex-direction: column;
-            align-items: center;
-            padding: 40px;
-            animation: fadeIn 0.4s ease;
+            padding: 15px 30px;
+            height: 100%;
+            box-sizing: border-box;
         }
+
+        .challenge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-shrink: 0;
+        }
+
+        #field-title { margin: 0; font-size: 1.2rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
 
         .workspace {
             display: grid;
-            grid-template-columns: 350px 450px;
-            gap: 40px;
-            margin-top: 20px;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
             max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+            flex-grow: 1;
         }
 
-        .column { display: flex; flex-direction: column; gap: 12px; }
-        .col-label { font-size: 0.75rem; font-weight: 800; opacity: 0.4; text-transform: uppercase; letter-spacing: 1px; }
+        .column { display: flex; flex-direction: column; gap: 10px; }
+        .col-label { font-size: 0.75rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
 
+        /* SKILLS & TARGETS (Compact for no-scroll) */
         .skill-item {
             background: #1e293b;
-            border: 1px solid var(--border);
-            padding: 16px;
-            border-radius: 12px;
+            border: 1px solid #475569;
+            padding: 12px 16px;
+            border-radius: 8px;
             cursor: grab;
             font-weight: 600;
-            font-size: 0.9rem;
-            transition: 0.2s;
+            font-size: 0.85rem;
+            transition: 0.15s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         .skill-item:hover { border-color: var(--accent); background: #334155; }
+        .skill-item:active { cursor: grabbing; }
 
         .target-slot {
-            background: rgba(0, 0, 0, 0.3);
-            border: 2px dashed var(--border);
-            padding: 20px;
-            border-radius: 16px;
-            min-height: 80px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 2px dashed #475569;
+            padding: 12px 16px;
+            border-radius: 8px;
+            min-height: 45px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             transition: 0.2s;
         }
 
-        .target-slot.hover { border-color: var(--accent); background: rgba(99, 102, 241, 0.1); }
+        .target-slot * { pointer-events: none; /* Prevents text inside from blocking the drop zone */ }
+
+        .target-slot.hover { border-color: var(--accent); background: rgba(56, 189, 248, 0.1); }
         .target-slot.correct { border: 2px solid var(--success); background: rgba(16, 185, 129, 0.1); border-style: solid; }
 
-        .career-name { font-weight: 800; font-size: 1.1rem; }
-        .matched-skill { font-size: 0.8rem; color: var(--success); margin-top: 8px; font-weight: 600; border-top: 1px solid rgba(16, 185, 129, 0.2); padding-top: 8px; }
+        /* Error Shake Animation */
+        .shake-error { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); border-color: #475569; }
+            20%, 60% { transform: translateX(-6px); border-color: var(--error); background: rgba(239, 68, 68, 0.1); }
+            40%, 80% { transform: translateX(6px); border-color: var(--error); background: rgba(239, 68, 68, 0.1); }
+        }
+
+        .career-name { font-weight: 800; font-size: 0.95rem; }
+        .matched-skill { font-size: 0.75rem; color: var(--success); margin-top: 6px; font-weight: 700; border-top: 1px solid rgba(16, 185, 129, 0.2); padding-top: 6px; }
 
         /* UI ELEMENTS */
         #modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center;
         }
         .modal-box {
-            background: #1e293b; padding: 40px; border-radius: 24px; max-width: 500px; width: 90%;
-            border-left: 10px solid var(--success);
+            background: #1e293b; padding: 30px; border-radius: 16px; max-width: 450px; width: 90%;
+            border-left: 6px solid var(--success); box-shadow: 0 10px 30px rgba(0,0,0,0.6);
         }
+        .modal-box h2 { color: var(--success); margin-top: 0; font-size: 1.3rem; }
+        .modal-box p { font-size: 0.95rem; line-height: 1.5; color: #e2e8f0; margin-bottom: 20px; }
 
-        .btn {
-            background: var(--accent); color: white; border: none; padding: 12px 24px;
-            border-radius: 8px; cursor: pointer; font-weight: 700; transition: 0.2s;
-        }
-        .btn-back { background: transparent; border: 1px solid #475569; color: #94a3b8; margin-bottom: 20px; }
-        .btn-back:hover { border-color: var(--accent); color: white; }
+        .btn { background: var(--accent); color: #020617; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .btn:hover { opacity: 0.9; }
+        .btn-back { background: transparent; border: 1px solid #475569; color: #cbd5e1; }
+        .btn-back:hover { border-color: var(--text); color: white; background: rgba(255,255,255,0.05); }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
 <header>
     <h1>TDJ Career Prospects</h1>
-    <div class="sub-header">Mr. Smart • 2026 Curriculum</div>
+    <div class="sub-header">Mr. Smart • Classroom to Career Pathway</div>
 </header>
 
 <div id="hub-page">
     <div class="category-card" onclick="loadPathway('mechanical')">
-        <h2>Mechanical Design</h2>
-        <p>Drafting standards, machine safety, and engineering physics.</p>
+        <h2>⚙️ Mechanical Design</h2>
+        <p>Aero-dynamics, thermodynamics, and precision machine engineering.</p>
     </div>
     <div class="category-card" onclick="loadPathway('architectural')">
-        <h2>Architectural Design</h2>
-        <p>Structural framing, site planning, and building codes.</p>
+        <h2>🏗️ Architectural Design</h2>
+        <p>Structural engineering, site planning, and municipal building codes.</p>
     </div>
     <div class="category-card" onclick="loadPathway('robotics')">
-        <h2>Robotics & Controls</h2>
-        <p>Logic circuitry, mechanical linkages, and automation.</p>
+        <h2>🤖 Robotics & Controls</h2>
+        <p>Logic circuits, sensory calibration, and automated mechanisms.</p>
     </div>
     <div class="category-card" onclick="loadPathway('industrial')">
-        <h2>Industrial Design</h2>
-        <p>Mass production theory, ergonomics, and aesthetics.</p>
+        <h2>🚲 Industrial Design</h2>
+        <p>Human ergonomics, injection molding, and mass manufacturing.</p>
     </div>
     <div class="category-card" onclick="loadPathway('interior')">
-        <h2>Interior Design</h2>
-        <p>Spatial flow, lighting psychology, and material specs.</p>
+        <h2>🛋️ Interior Design</h2>
+        <p>Commercial spatial flow, lighting psychology, and AODA standards.</p>
     </div>
     <div class="category-card" onclick="loadPathway('apparel')">
-        <h2>Apparel & Textiles</h2>
-        <p>Pattern drafting, garment construction, and textiles.</p>
+        <h2>👕 Apparel & Textiles</h2>
+        <p>2D pattern geometry, fabric engineering, and supply chain logistics.</p>
     </div>
 </div>
 
 <div id="challenge-page">
-    <button class="btn btn-back" onclick="goHome()">← Back to Pathways</button>
-    <h2 id="field-title">PATHWAY EXPLORATION</h2>
+    <div class="challenge-header">
+        <h2 id="field-title">PATHWAY</h2>
+        <button class="btn btn-back" onclick="goHome()">← Back to Hub</button>
+    </div>
     <div class="workspace">
         <div class="column" id="skills-col"></div>
         <div class="column" id="targets-col"></div>
@@ -179,68 +210,69 @@
 
 <div id="modal">
     <div class="modal-box">
-        <h2 style="color:var(--success)">Translation Applied</h2>
+        <h2 id="m-title">Match Confirmed</h2>
         <p id="m-desc"></p>
-        <button class="btn" style="width: 100%" onclick="closeModal()">Return to Blueprint</button>
+        <button class="btn" style="width: 100%" onclick="closeModal()">Continue</button>
     </div>
 </div>
 
 <script>
+    // Data features highly specific skills to eliminate interchangeable confusion.
     const database = {
         mechanical: [
-            { s: "ISO & Orthographic Layouts", c: "Mechanical Engineer", d: "Professional Translation: Engineering firms require standardized 2D blueprints so parts designed in Ontario can be flawlessly manufactured anywhere in the world." },
-            { s: "Bandsaw & Tool Tolerances", c: "Precision Fabricator", d: "Professional Translation: Knowing the specific 'kerf' or waste of a machine tool is the difference between a part fitting an assembly or being scrap metal." },
-            { s: "Heat Transfer Research", c: "HVAC Systems Designer", d: "Professional Translation: Understanding how materials conduct heat allows you to design climate control systems for massive industrial plants." },
-            { s: "3D Digital Assemblies", c: "Automotive Designer", d: "Professional Translation: Modern cars are built digitally first. Engineers use CAD to test part interference before a single piece of steel is stamped." },
-            { s: "Fastener & Joinery Strength", c: "Structural Lead", d: "Professional Translation: Calculating the shear strength of bolts and joints ensures that heavy machinery remains safe under vibrating loads." },
-            { s: "Material Hardness Testing", c: "Metallurgist", d: "Professional Translation: Selecting the right alloy based on shop tests ensures that tools don't shatter or wear down during high-speed production." }
+            { s: "Designing ISO/Orthographic Gear Assemblies", c: "Mechanical Engineer", d: "Standardized 2D technical drawings ensure that machine parts designed in Ontario can be flawlessly manufactured anywhere in the world." },
+            { s: "Calculating Machine Tool Tolerances & Kerf", c: "Precision Fabricator", d: "Knowing the specific waste material (kerf) of a machine tool is the difference between a part fitting perfectly into an engine or being scrap metal." },
+            { s: "Testing Thermal Conductivity in Metals", c: "HVAC Systems Designer", d: "Understanding how different alloys conduct or resist heat is required to design climate control systems for massive industrial plants." },
+            { s: "Modeling 3D Automotive Surfaces in CAD", c: "Automotive Designer", d: "Modern cars are built digitally first. CAD allows you to test aerodynamics and part interference before a single piece of steel is stamped." },
+            { s: "Testing Tensile Strength of Fasteners", c: "Quality Assurance Metallurgist", d: "Calculating the shear strength of bolts and joints ensures that heavy machinery remains safe and intact under extreme vibrating loads." },
+            { s: "Analyzing Engine Vibration and Acoustics", c: "Acoustical Engineer", d: "Identifying rattles and sound waves in prototypes leads to designing quieter, more comfortable cabins for aircraft and high-end vehicles." }
         ],
         architectural: [
-            { s: "Stud & Joist Framing", c: "Structural Engineer", d: "Professional Translation: Understanding weight transfer is exactly how professionals prevent buildings from collapsing during storms." },
-            { s: "OBC (Building Code) Analysis", c: "Municipal Plan Examiner", d: "Professional Translation: Every design must meet strict fire and safety laws before a building permit is issued." },
-            { s: "Topographic Elevation Maps", c: "Civil Engineering Tech", d: "Professional Translation: Precise site measurements are the first step in designing drainage for new housing developments." },
-            { s: "Sustainable Material Sourcing", c: "Green Building Consultant", d: "Professional Translation: Choosing renewable materials reduces a building's carbon footprint—a major requirement for modern cities." },
-            { s: "HVAC & Ducting Layouts", c: "Building Services Lead", d: "Professional Translation: Coordinating air/water systems through tight floor spaces requires the 3D spatial thinking developed in drafting." },
-            { s: "Scale Model Prototyping", c: "Architectural Visualizer", d: "Professional Translation: Scale models help clients 'feel' a space, preventing costly changes once real construction begins." }
+            { s: "Framing Wooden Studs & Floor Joists", c: "Construction Superintendent", d: "Understanding load-bearing weight transfer is how professionals manage massive job sites and prevent buildings from collapsing." },
+            { s: "Mapping Topographic Site Elevations", c: "Civil Engineering Tech", d: "Accurate physical site measurements are the absolute first step in designing drainage and road networks for new housing developments." },
+            { s: "Analyzing the Ontario Building Code (OBC)", c: "Municipal Plan Examiner", d: "Every design must be cross-referenced with strict fire and safety laws before a city will ever issue a legal building permit." },
+            { s: "Building 1:50 Scale Presentation Models", c: "Architectural Visualizer", d: "Physical scale models help clients understand the spatial volume of a room, preventing costly changes once real construction begins." },
+            { s: "Sourcing Sustainable Green Materials", c: "Environmental Building Consultant", d: "Selecting renewable materials minimizes a building's lifetime carbon footprint—a major legal requirement for modern city infrastructure." },
+            { s: "Drafting HVAC & Ducting Layouts", c: "Building Services Engineer", d: "Coordinating air and water pipes through tight floor spaces requires the advanced 3D spatial thinking developed during drafting." }
         ],
         robotics: [
-            { s: "Logic Gate Circuitry", c: "Control Systems Designer", d: "Professional Translation: The same logic you use to wire a sensor runs the automated assembly lines for companies like Amazon and Tesla." },
-            { s: "Gear Ratio Calculations", c: "Mechatronics Engineer", d: "Professional Translation: Calculating torque vs speed ensures that robotic arms can lift heavy loads without burning out motors." },
-            { s: "Soldering & PCB Assembly", c: "Electronics Technician", d: "Professional Translation: Precision hand-work on circuits is vital for building and repairing medical devices and satellites." },
-            { s: "Sensor Calibration (PID)", c: "Automation Specialist", d: "Professional Translation: Adjusting sensors for accuracy is how self-driving cars 'see' the road and react to obstacles in real-time." },
-            { s: "Pneumatic & Valve Logic", c: "Industrial Maintenance Lead", d: "Professional Translation: Using air pressure to move cylinders is the primary way heavy industrial factories move products." },
-            { s: "Debugging & Troubleshooting", c: "Field Service Engineer", d: "Professional Translation: The patience to find a 'short' or a logic error is the exact skill needed to maintain complex global tech networks." }
+            { s: "Wiring Logic Gate Circuit Boards", c: "Control Systems Designer", d: "The 'If/Then' logic used to wire a simple breadboard sensor is the exact same logic used to run automated assembly lines." },
+            { s: "Calculating Motor Gear Ratios", c: "Mechatronics Engineer", d: "Calculating torque versus speed ensures that a robotic arm has enough power to lift heavy loads without burning out its motors." },
+            { s: "Soldering Micro-components & PCBs", c: "Electronics Technician", d: "Precision hand-work and soldering on circuit boards is a mandatory skill for building and repairing medical devices and satellites." },
+            { s: "Calibrating PID Motion Sensors", c: "Automation Specialist", d: "Fine-tuning sensors for extreme accuracy is how self-driving cars 'see' the road and react to obstacles in real-time." },
+            { s: "Programming Pneumatic Valve Sequences", c: "Industrial Maintenance Lead", d: "Using compressed air pressure to move mechanical cylinders is the primary way heavy factories move products across assembly lines." },
+            { s: "Debugging Python/C++ Control Scripts", c: "Field Service Robotics Engineer", d: "The patience required to find a syntax error in your code is the exact skill needed to keep complex global tech networks online." }
         ],
         industrial: [
-            { s: "Ergonomic Hand-Forming", c: "Product Designer", d: "Professional Translation: Designing tool handles or medical devices requires testing measurements of the human hand (anthropometrics)." },
-            { s: "Injection Molding Theory", c: "Manufacturing Lead", d: "Professional Translation: Knowing how plastic flows into a mold allows you to design consumer products that are cheap to produce and durable." },
-            { s: "Rapid Cardboard Mockups", c: "Concept Artist", d: "Professional Translation: Fast physical mockups allow designers to test the 'scale' of a product before committing to expensive production." },
-            { s: "Aesthetic Color Theory", c: "Brand Design Lead", d: "Professional Translation: The 'look' of a product communicates its value. Designers use color and texture to influence consumer behavior." },
-            { s: "Product Lifecycle Analysis", c: "Sustainability Lead", d: "Professional Translation: Modern designers must plan for how a product will be recycled at the very start of the design process." },
-            { s: "Drafting Part Tolerances", c: "Tool and Die Maker", d: "Professional Translation: In mass production, parts must be interchangeable. Precise tolerances ensure that millions of units fit together." }
+            { s: "Hand-Shaping Ergonomic Clay Handles", c: "Product Designer", d: "Designing hand-held tools or medical devices requires testing anthropometrics (the physical measurements and grip of the human hand)." },
+            { s: "Analyzing Plastic Injection Flow Lines", c: "Manufacturing Lead", d: "Knowing how melted plastic flows into a mold allows you to design consumer products that are cheap to produce and structurally durable." },
+            { s: "Building Rapid Cardboard Usability Mockups", c: "UX Hardware Researcher", d: "Fast, disposable physical mockups allow designers to test the basic scale and feel of a product before committing to expensive 3D printing." },
+            { s: "Applying Aesthetic Color Theory & Textures", c: "Brand Design Lead", d: "The physical look and feel of a product communicates its value. Designers use color and material finish to influence consumer psychology." },
+            { s: "Mapping the Product Recycling Lifecycle", c: "Sustainability Lead", d: "Modern industrial designers must plan for how a product will be disassembled and recycled at the very start of the design phase." },
+            { s: "Drafting Interchangeable Part Tolerances", c: "Tool and Die Maker", d: "In mass production, parts must be universally interchangeable. Precise drafting tolerances ensure that millions of units fit together perfectly." }
         ],
         interior: [
-            { s: "Spatial Circulation Planning", c: "Interior Architect", d: "Professional Translation: Understanding 'flow' ensures that high-traffic buildings like hospitals operate without human bottlenecks." },
-            { s: "Material Finish Specification", c: "FF&E Specialist", d: "Professional Translation: Selecting commercial-grade fabrics ensures that a design stays beautiful even with thousands of daily visitors." },
-            { s: "Lighting Psychology", c: "Lighting Designer", d: "Professional Translation: Light temperature and intensity can change how people feel in a space—essential for retail and healthcare." },
-            { s: "Perspective Interior Rendering", c: "Virtual Reality Designer", d: "Professional Translation: 3D visuals allow clients to walk through a finished room before a single dollar is spent on construction." },
-            { s: "Millwork & Cabinetry Design", c: "Custom Furniture Maker", d: "Professional Translation: Precision shop drawings for 'built-ins' maximize storage in tight urban apartments and offices." },
-            { s: "Universal Design Standards", c: "Accessibility Consultant", d: "Professional Translation: Designing for all abilities ensures that spaces are inclusive and safe for every citizen." }
+            { s: "Planning Spatial Traffic & Circulation Flow", c: "Interior Architect", d: "Understanding human movement ensures that high-traffic buildings like hospitals and airports operate smoothly without dangerous bottlenecks." },
+            { s: "Specifying Commercial-Grade Floor Finishes", c: "FF&E Specialist", d: "Selecting the correct durability for fabrics and flooring ensures that a commercial space stays functional even with thousands of daily visitors." },
+            { s: "Designing Mood & Task Lighting Plans", c: "Lighting Designer", d: "Light temperature and intensity directly change how people feel and behave in a space, which is essential for retail spaces and offices." },
+            { s: "Rendering 2-Point Perspective Rooms", c: "Virtual Reality Designer", d: "Accurate 3D visual renderings allow clients to walk through a finished room digitally before a single dollar is spent on construction." },
+            { s: "Drafting Custom Millwork & Cabinetry", c: "Custom Furniture Maker", d: "Creating precision shop drawings for built-in cabinets maximizes storage in tight urban apartments and high-end corporate offices." },
+            { s: "Applying AODA Universal Design Standards", c: "Accessibility Consultant", d: "Designing for all physical abilities ensures that public spaces are legally compliant, inclusive, and safe for every citizen." }
         ],
         apparel: [
-            { s: "Pattern Drafting & Slopers", c: "Technical Designer", d: "Professional Translation: Flat patterns are the 'blueprints' of fashion. Accurate geometry ensures that 2D fabric fits a moving 3D human body." },
-            { s: "Fabric Performance Research", c: "Textile Scientist", d: "Professional Translation: Researching 'wicking' or 'tensile strength' leads to developing high-performance gear for athletes." },
-            { s: "Garment Construction", c: "Production Manager", d: "Professional Translation: Knowing how a garment is physically built allows you to manage factory floors and ensure quality." },
-            { s: "CAD Fashion Illustration", c: "Fashion Designer", d: "Professional Translation: Digital sketches allow brands to share seasonal lines with global manufacturers instantly." },
-            { s: "Supply Chain Management", c: "Merchandising Lead", d: "Professional Translation: Coordinating fabric, labor, and shipping is a massive logistical challenge that drives the global industry." },
-            { s: "Tailoring & Fit Analysis", c: "Custom Apparel Specialist", d: "Professional Translation: The ability to alter a design for a specific client is a high-value skill in bespoke menswear and couture." }
+            { s: "Drafting 2D Flat Patterns & Slopers", c: "Technical Fashion Designer", d: "Flat patterns are the blueprints of fashion. Accurate geometry ensures that 2D fabric properly fits and curves around a moving 3D human body." },
+            { s: "Testing Fabric Tensile & Wicking Strength", c: "Textile Scientist", d: "Researching how materials stretch and absorb moisture leads directly to developing high-performance gear for athletes and first responders." },
+            { s: "Sewing & Assembling Garment Seams", c: "Production Manager", d: "Knowing exactly how a garment is physically stitched together allows you to manage factory floors and ensure high-quality manufacturing standards." },
+            { s: "Illustrating Seasonal Lines in CAD", c: "Fashion Illustrator", d: "Digital vector sketches allow clothing brands to share their seasonal concepts with global manufacturers instantly without shipping samples." },
+            { s: "Coordinating Global Fabric Sourcing", c: "Merchandising Lead", d: "Managing fabric orders, labor costs, and shipping timelines is the massive logistical challenge that drives the global garment industry." },
+            { s: "Tailoring & Altering Fit for Clients", c: "Custom Apparel Specialist", d: "The physical ability to alter and adjust a design for a specific client's body is a high-value skill in bespoke menswear and couture fashion." }
         ]
     };
 
     function loadPathway(field) {
         document.getElementById('hub-page').style.display = 'none';
         document.getElementById('challenge-page').style.display = 'flex';
-        document.getElementById('field-title').innerText = field.toUpperCase() + " PATHWAY";
+        document.getElementById('field-title').innerText = field + " Pathway";
         
         const sCol = document.getElementById('skills-col');
         const tCol = document.getElementById('targets-col');
@@ -268,6 +300,7 @@
             div.className = 'target-slot';
             div.dataset.match = `skill-${originalIdx}`;
             div.dataset.desc = item.d;
+            div.dataset.career = item.c;
             div.dataset.skillName = item.s;
             div.innerHTML = `<div class="career-name">${item.c}</div>`;
             div.addEventListener('dragover', e => e.preventDefault());
@@ -285,17 +318,28 @@
         const draggedId = e.dataTransfer.getData('text');
 
         if (slot.dataset.match === draggedId) {
+            // Correct Match
             slot.classList.add('correct');
-            // Show the skill inside the slot instead of making it disappear
-            slot.innerHTML += `<div class="matched-skill">✓ Skill: ${slot.dataset.skillName}</div>`;
-            document.getElementById(draggedId).style.opacity = '0.3';
-            document.getElementById(draggedId).style.pointerEvents = 'none';
+            slot.innerHTML += `<div class="matched-skill">✓ ${slot.dataset.skillName}</div>`;
             
+            // Hide the original draggable item
+            document.getElementById(draggedId).style.opacity = '0';
+            document.getElementById(draggedId).style.pointerEvents = 'none';
+            document.getElementById(draggedId).style.height = '0';
+            document.getElementById(draggedId).style.padding = '0';
+            document.getElementById(draggedId).style.margin = '0';
+            document.getElementById(draggedId).style.border = 'none';
+            
+            // Populate and show modal
+            document.getElementById('m-title').innerText = "Match Confirmed: " + slot.dataset.career;
             document.getElementById('m-desc').innerText = slot.dataset.desc;
             document.getElementById('modal').style.display = 'flex';
         } else {
-            slot.style.borderColor = "#ef4444";
-            setTimeout(() => slot.style.borderColor = "rgba(255,255,255,0.1)", 500);
+            // Incorrect Match - Trigger Shake Error
+            slot.classList.remove('shake-error');
+            // Trigger reflow to restart animation
+            void slot.offsetWidth; 
+            slot.classList.add('shake-error');
         }
     }
 
