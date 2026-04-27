@@ -2,12 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TDJ Career Prospects - Mr. Smart</title>
     
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/drag-drop-touch@1.3.1/DragDropTouch.min.js"></script>
 
     <style>
         :root {
@@ -25,11 +23,10 @@
             background: #020617;
             color: var(--text);
             margin: 0;
-            height: 100vh;
+            height: 100vh; /* Forces body to viewport height */
+            overflow: hidden; /* Prevents scrolling entirely */
             display: flex;
             flex-direction: column;
-            overflow: hidden;
-            touch-action: none;
         }
 
         header {
@@ -40,9 +37,10 @@
             flex-shrink: 0;
         }
 
-        h1 { margin: 0; font-size: 1.5rem; font-weight: 800; }
+        h1 { margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; }
         .sub-header { color: #94a3b8; font-size: 0.8rem; margin-top: 4px; text-transform: uppercase; letter-spacing: 2px; }
 
+        /* PATHWAY HUB */
         #hub-page {
             max-width: 1100px;
             margin: 0 auto;
@@ -61,33 +59,111 @@
             border-radius: 12px;
             cursor: pointer;
             text-align: center;
+            transition: 0.2s ease-in-out;
+        }
+
+        .category-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+            background: #27354d;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+
+        .category-card h2 { margin: 0 0 8px; font-size: 1.1rem; color: var(--accent); }
+        .category-card p { margin: 0; font-size: 0.8rem; color: #cbd5e1; line-height: 1.4; }
+
+        /* CHALLENGE WORKSPACE */
+        #challenge-page {
+            display: none;
+            flex-direction: column;
+            padding: 15px 30px;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .challenge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-shrink: 0;
+        }
+
+        #field-title { margin: 0; font-size: 1.2rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+            flex-grow: 1;
+        }
+
+        .column { display: flex; flex-direction: column; gap: 10px; }
+        .col-label { font-size: 0.75rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+
+        /* SKILLS & TARGETS (Compact for no-scroll) */
+        .skill-item {
+            background: #1e293b;
+            border: 1px solid #475569;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: grab;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: 0.15s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .skill-item:hover { border-color: var(--accent); background: #334155; }
+        .skill-item:active { cursor: grabbing; }
+
+        .target-slot {
+            background: rgba(0, 0, 0, 0.2);
+            border: 2px dashed #475569;
+            padding: 12px 16px;
+            border-radius: 8px;
+            min-height: 45px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             transition: 0.2s;
         }
 
-        .category-card:hover { transform: translateY(-4px); border-color: var(--accent); background: #27354d; }
-        .category-card h2 { margin: 0 0 8px; font-size: 1.1rem; color: var(--accent); }
-        .category-card p { margin: 0; font-size: 0.8rem; color: #cbd5e1; }
+        .target-slot * { pointer-events: none; /* Prevents text inside from blocking the drop zone */ }
 
-        #challenge-page { display: none; flex-direction: column; padding: 15px 30px; height: 100%; box-sizing: border-box; }
-        .challenge-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .workspace { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 1000px; margin: 0 auto; width: 100%; }
+        .target-slot.hover { border-color: var(--accent); background: rgba(56, 189, 248, 0.1); }
+        .target-slot.correct { border: 2px solid var(--success); background: rgba(16, 185, 129, 0.1); border-style: solid; }
 
-        .column { display: flex; flex-direction: column; gap: 10px; }
-        .skill-item { background: #1e293b; border: 1px solid #475569; padding: 12px 16px; border-radius: 8px; cursor: grab; font-weight: 600; font-size: 0.85rem; z-index: 100; touch-action: none; }
-        
-        .target-slot { background: rgba(0, 0, 0, 0.2); border: 2px dashed #475569; padding: 12px 16px; border-radius: 8px; min-height: 45px; display: flex; flex-direction: column; justify-content: center; transition: 0.2s; }
-        .drop-hover { border-color: var(--accent); background: rgba(56, 189, 248, 0.1); }
-        .correct { border: 2px solid var(--success) !important; background: rgba(16, 185, 129, 0.1) !important; border-style: solid !important; }
-        
-        .shake-error { animation: shake 0.4s both; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+        /* Error Shake Animation */
+        .shake-error { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); border-color: #475569; }
+            20%, 60% { transform: translateX(-6px); border-color: var(--error); background: rgba(239, 68, 68, 0.1); }
+            40%, 80% { transform: translateX(6px); border-color: var(--error); background: rgba(239, 68, 68, 0.1); }
+        }
 
-        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-box { background: #1e293b; padding: 30px; border-radius: 16px; max-width: 450px; width: 90%; border-left: 6px solid var(--success); }
-        .btn { background: var(--accent); color: #020617; border: none; padding: 12px 20px; border-radius: 6px; font-weight: 800; cursor: pointer; width: 100%; }
-        .btn-back { background: transparent; border: 1px solid #475569; color: #cbd5e1; width: auto; padding: 8px 15px; }
-
+        .career-name { font-weight: 800; font-size: 0.95rem; }
         .matched-skill { font-size: 0.75rem; color: var(--success); margin-top: 6px; font-weight: 700; border-top: 1px solid rgba(16, 185, 129, 0.2); padding-top: 6px; }
+
+        /* UI ELEMENTS */
+        #modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center;
+        }
+        .modal-box {
+            background: #1e293b; padding: 30px; border-radius: 16px; max-width: 450px; width: 90%;
+            border-left: 6px solid var(--success); box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        }
+        .modal-box h2 { color: var(--success); margin-top: 0; font-size: 1.3rem; }
+        .modal-box p { font-size: 0.95rem; line-height: 1.5; color: #e2e8f0; margin-bottom: 20px; }
+
+        .btn { background: var(--accent); color: #020617; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .btn:hover { opacity: 0.9; }
+        .btn-back { background: transparent; border: 1px solid #475569; color: #cbd5e1; }
+        .btn-back:hover { border-color: var(--text); color: white; background: rgba(255,255,255,0.05); }
+
     </style>
 </head>
 <body>
@@ -98,18 +174,36 @@
 </header>
 
 <div id="hub-page">
-    <div class="category-card" onclick="loadPathway('mechanical')"><h2>⚙️ Mechanical</h2><p>Machine engineering and precision.</p></div>
-    <div class="category-card" onclick="loadPathway('architectural')"><h2>🏗️ Architectural</h2><p>Structural and site planning.</p></div>
-    <div class="category-card" onclick="loadPathway('robotics')"><h2>🤖 Robotics</h2><p>Logic and automation.</p></div>
-    <div class="category-card" onclick="loadPathway('industrial')"><h2>🚲 Industrial</h2><p>Manufacturing and ergonomics.</p></div>
-    <div class="category-card" onclick="loadPathway('interior')"><h2> Couch Interior</h2><p>Spatial flow and AODA.</p></div>
-    <div class="category-card" onclick="loadPathway('apparel')"><h2>👕 Apparel</h2><p>Pattern geometry and textiles.</p></div>
+    <div class="category-card" onclick="loadPathway('mechanical')">
+        <h2>⚙️ Mechanical Design</h2>
+        <p>Aero-dynamics, thermodynamics, and precision machine engineering.</p>
+    </div>
+    <div class="category-card" onclick="loadPathway('architectural')">
+        <h2>🏗️ Architectural Design</h2>
+        <p>Structural engineering, site planning, and municipal building codes.</p>
+    </div>
+    <div class="category-card" onclick="loadPathway('robotics')">
+        <h2>🤖 Robotics & Controls</h2>
+        <p>Logic circuits, sensory calibration, and automated mechanisms.</p>
+    </div>
+    <div class="category-card" onclick="loadPathway('industrial')">
+        <h2>🚲 Industrial Design</h2>
+        <p>Human ergonomics, injection molding, and mass manufacturing.</p>
+    </div>
+    <div class="category-card" onclick="loadPathway('interior')">
+        <h2>🛋️ Interior Design</h2>
+        <p>Commercial spatial flow, lighting psychology, and AODA standards.</p>
+    </div>
+    <div class="category-card" onclick="loadPathway('apparel')">
+        <h2>👕 Apparel & Textiles</h2>
+        <p>2D pattern geometry, fabric engineering, and supply chain logistics.</p>
+    </div>
 </div>
 
 <div id="challenge-page">
     <div class="challenge-header">
         <h2 id="field-title">PATHWAY</h2>
-        <button class="btn btn-back" onclick="goHome()">← Back</button>
+        <button class="btn btn-back" onclick="goHome()">← Back to Hub</button>
     </div>
     <div class="workspace">
         <div class="column" id="skills-col"></div>
@@ -121,69 +215,142 @@
     <div class="modal-box">
         <h2 id="m-title">Match Confirmed</h2>
         <p id="m-desc"></p>
-        <button class="btn" onclick="closeModal()">Continue</button>
+        <button class="btn" style="width: 100%" onclick="closeModal()">Continue</button>
     </div>
 </div>
 
 <script>
+    // Data features highly specific skills to eliminate interchangeable confusion.
     const database = {
         mechanical: [
-            { s: "Designing ISO Gear Assemblies", c: "Mechanical Engineer", d: "Standardized 2D drawings ensure parts can be manufactured anywhere." },
-            { s: "Calculating Tool Tolerances", c: "Precision Fabricator", d: "Precision is the difference between a working part and scrap metal." }
+            { s: "Designing ISO/Orthographic Gear Assemblies", c: "Mechanical Engineer", d: "Standardized 2D technical drawings ensure that machine parts designed in Ontario can be flawlessly manufactured anywhere in the world." },
+            { s: "Calculating Machine Tool Tolerances & Kerf", c: "Precision Fabricator", d: "Knowing the specific waste material (kerf) of a machine tool is the difference between a part fitting perfectly into an engine or being scrap metal." },
+            { s: "Testing Thermal Conductivity in Metals", c: "HVAC Systems Designer", d: "Understanding how different alloys conduct or resist heat is required to design climate control systems for massive industrial plants." },
+            { s: "Modeling 3D Automotive Surfaces in CAD", c: "Automotive Designer", d: "Modern cars are built digitally first. CAD allows you to test aerodynamics and part interference before a single piece of steel is stamped." },
+            { s: "Testing Tensile Strength of Fasteners", c: "Quality Assurance Metallurgist", d: "Calculating the shear strength of bolts and joints ensures that heavy machinery remains safe and intact under extreme vibrating loads." },
+            { s: "Analyzing Engine Vibration and Acoustics", c: "Acoustical Engineer", d: "Identifying rattles and sound waves in prototypes leads to designing quieter, more comfortable cabins for aircraft and high-end vehicles." }
         ],
         architectural: [
-            { s: "Framing Wooden Studs", c: "Construction Lead", d: "Understanding load-bearing weight prevents buildings from collapsing." },
-            { s: "Mapping Site Elevations", c: "Civil Engineering Tech", d: "Accurate measurements are the first step in municipal infrastructure." }
+            { s: "Framing Wooden Studs & Floor Joists", c: "Construction Superintendent", d: "Understanding load-bearing weight transfer is how professionals manage massive job sites and prevent buildings from collapsing." },
+            { s: "Mapping Topographic Site Elevations", c: "Civil Engineering Tech", d: "Accurate physical site measurements are the absolute first step in designing drainage and road networks for new housing developments." },
+            { s: "Analyzing the Ontario Building Code (OBC)", c: "Municipal Plan Examiner", d: "Every design must be cross-referenced with strict fire and safety laws before a city will ever issue a legal building permit." },
+            { s: "Building 1:50 Scale Presentation Models", c: "Architectural Visualizer", d: "Physical scale models help clients understand the spatial volume of a room, preventing costly changes once real construction begins." },
+            { s: "Sourcing Sustainable Green Materials", c: "Environmental Building Consultant", d: "Selecting renewable materials minimizes a building's lifetime carbon footprint—a major legal requirement for modern city infrastructure." },
+            { s: "Drafting HVAC & Ducting Layouts", c: "Building Services Engineer", d: "Coordinating air and water pipes through tight floor spaces requires the advanced 3D spatial thinking developed during drafting." }
         ],
         robotics: [
-            { s: "Wiring Logic Gate Boards", c: "Systems Designer", d: "The logic used in breadboards runs modern assembly lines." },
-            { s: "Calculating Gear Ratios", c: "Mechatronics Engineer", d: "Ensures a robotic arm has enough torque to lift heavy loads." }
+            { s: "Wiring Logic Gate Circuit Boards", c: "Control Systems Designer", d: "The 'If/Then' logic used to wire a simple breadboard sensor is the exact same logic used to run automated assembly lines." },
+            { s: "Calculating Motor Gear Ratios", c: "Mechatronics Engineer", d: "Calculating torque versus speed ensures that a robotic arm has enough power to lift heavy loads without burning out its motors." },
+            { s: "Soldering Micro-components & PCBs", c: "Electronics Technician", d: "Precision hand-work and soldering on circuit boards is a mandatory skill for building and repairing medical devices and satellites." },
+            { s: "Calibrating PID Motion Sensors", c: "Automation Specialist", d: "Fine-tuning sensors for extreme accuracy is how self-driving cars 'see' the road and react to obstacles in real-time." },
+            { s: "Programming Pneumatic Valve Sequences", c: "Industrial Maintenance Lead", d: "Using compressed air pressure to move mechanical cylinders is the primary way heavy factories move products across assembly lines." },
+            { s: "Debugging Python/C++ Control Scripts", c: "Field Service Robotics Engineer", d: "The patience required to find a syntax error in your code is the exact skill needed to keep complex global tech networks online." }
         ],
         industrial: [
-            { s: "Shaping Ergonomic Handles", c: "Product Designer", d: "Tools must be designed to fit the human hand perfectly." },
-            { s: "Injection Flow Analysis", c: "Manufacturing Lead", d: "Ensures consumer products are durable and cheap to produce." }
+            { s: "Hand-Shaping Ergonomic Clay Handles", c: "Product Designer", d: "Designing hand-held tools or medical devices requires testing anthropometrics (the physical measurements and grip of the human hand)." },
+            { s: "Analyzing Plastic Injection Flow Lines", c: "Manufacturing Lead", d: "Knowing how melted plastic flows into a mold allows you to design consumer products that are cheap to produce and structurally durable." },
+            { s: "Building Rapid Cardboard Usability Mockups", c: "UX Hardware Researcher", d: "Fast, disposable physical mockups allow designers to test the basic scale and feel of a product before committing to expensive 3D printing." },
+            { s: "Applying Aesthetic Color Theory & Textures", c: "Brand Design Lead", d: "The physical look and feel of a product communicates its value. Designers use color and material finish to influence consumer psychology." },
+            { s: "Mapping the Product Recycling Lifecycle", c: "Sustainability Lead", d: "Modern industrial designers must plan for how a product will be disassembled and recycled at the very start of the design phase." },
+            { s: "Drafting Interchangeable Part Tolerances", c: "Tool and Die Maker", d: "In mass production, parts must be universally interchangeable. Precise drafting tolerances ensure that millions of units fit together perfectly." }
         ],
         interior: [
-            { s: "Planning Traffic Flow", c: "Interior Architect", d: "Prevents bottlenecks in high-traffic buildings like hospitals." },
-            { s: "AODA Design Standards", c: "Accessibility Consultant", d: "Ensures public spaces are inclusive and safe for all citizens." }
+            { s: "Planning Spatial Traffic & Circulation Flow", c: "Interior Architect", d: "Understanding human movement ensures that high-traffic buildings like hospitals and airports operate smoothly without dangerous bottlenecks." },
+            { s: "Specifying Commercial-Grade Floor Finishes", c: "FF&E Specialist", d: "Selecting the correct durability for fabrics and flooring ensures that a commercial space stays functional even with thousands of daily visitors." },
+            { s: "Designing Mood & Task Lighting Plans", c: "Lighting Designer", d: "Light temperature and intensity directly change how people feel and behave in a space, which is essential for retail spaces and offices." },
+            { s: "Rendering 2-Point Perspective Rooms", c: "Virtual Reality Designer", d: "Accurate 3D visual renderings allow clients to walk through a finished room digitally before a single dollar is spent on construction." },
+            { s: "Drafting Custom Millwork & Cabinetry", c: "Custom Furniture Maker", d: "Creating precision shop drawings for built-in cabinets maximizes storage in tight urban apartments and high-end corporate offices." },
+            { s: "Applying AODA Universal Design Standards", c: "Accessibility Consultant", d: "Designing for all physical abilities ensures that public spaces are legally compliant, inclusive, and safe for every citizen." }
         ],
         apparel: [
-            { s: "Drafting 2D Flat Patterns", c: "Technical Designer", d: "Geometry ensures 2D fabric fits a moving 3D human body." },
-            { s: "Testing Fabric Strength", c: "Textile Scientist", d: "Develops high-performance gear for athletes and first responders." }
+            { s: "Drafting 2D Flat Patterns & Slopers", c: "Technical Fashion Designer", d: "Flat patterns are the blueprints of fashion. Accurate geometry ensures that 2D fabric properly fits and curves around a moving 3D human body." },
+            { s: "Testing Fabric Tensile & Wicking Strength", c: "Textile Scientist", d: "Researching how materials stretch and absorb moisture leads directly to developing high-performance gear for athletes and first responders." },
+            { s: "Sewing & Assembling Garment Seams", c: "Production Manager", d: "Knowing exactly how a garment is physically stitched together allows you to manage factory floors and ensure high-quality manufacturing standards." },
+            { s: "Illustrating Seasonal Lines in CAD", c: "Fashion Illustrator", d: "Digital vector sketches allow clothing brands to share their seasonal concepts with global manufacturers instantly without shipping samples." },
+            { s: "Coordinating Global Fabric Sourcing", c: "Merchandising Lead", d: "Managing fabric orders, labor costs, and shipping timelines is the massive logistical challenge that drives the global garment industry." },
+            { s: "Tailoring & Altering Fit for Clients", c: "Custom Apparel Specialist", d: "The physical ability to alter and adjust a design for a specific client's body is a high-value skill in bespoke menswear and couture fashion." }
         ]
     };
 
     function loadPathway(field) {
-        $('#hub-page').hide();
-        $('#challenge-page').css('display', 'flex');
-        $('#field-title').text(field.toUpperCase() + " PATHWAY");
+        document.getElementById('hub-page').style.display = 'none';
+        document.getElementById('challenge-page').style.display = 'flex';
+        document.getElementById('field-title').innerText = field + " Pathway";
         
-        const sCol = $('#skills-col').empty().append('<div class="col-label">Skills</div>');
-        const tCol = $('#targets-col').empty().append('<div class="col-label">Careers</div>');
+        const sCol = document.getElementById('skills-col');
+        const tCol = document.getElementById('targets-col');
+        sCol.innerHTML = '<div class="col-label">Classroom Skills</div>';
+        tCol.innerHTML = '<div class="col-label">Industry Career Paths</div>';
 
-        database[field].forEach((item, idx) => {
-            $('<div class="skill-item"></div>').text(item.s).attr('data-id', idx).appendTo(sCol).draggable({ revert: "invalid", helper: "clone", appendTo: "body" });
-            $('<div class="target-slot"></div>').html(`<strong>${item.c}</strong>`).attr('data-id', idx).attr('data-desc', item.d).attr('data-career', item.c).attr('data-skill', item.s).appendTo(tCol).droppable({
-                accept: ".skill-item",
-                hoverClass: "drop-hover",
-                drop: function(event, ui) {
-                    if ($(this).attr('data-id') == ui.draggable.attr('data-id')) {
-                        $(this).addClass('correct').append(`<div class="matched-skill">✓ ${$(this).attr('data-skill')}</div>`);
-                        ui.draggable.hide();
-                        $('#m-title').text("Match: " + $(this).attr('data-career'));
-                        $('#m-desc').text($(this).attr('data-desc'));
-                        $('#modal').css('display', 'flex');
-                    } else {
-                        $(this).addClass('shake-error');
-                        setTimeout(() => $(this).removeClass('shake-error'), 400);
-                    }
-                }
-            });
+        const list = database[field];
+        
+        // Shuffle skills
+        [...list].sort(() => Math.random() - 0.5).forEach((item, idx) => {
+            const originalIdx = list.findIndex(x => x.s === item.s);
+            const div = document.createElement('div');
+            div.className = 'skill-item';
+            div.draggable = true;
+            div.innerText = item.s;
+            div.id = `skill-${originalIdx}`;
+            div.addEventListener('dragstart', e => e.dataTransfer.setData('text', e.target.id));
+            sCol.appendChild(div);
+        });
+
+        // Shuffle targets
+        [...list].sort(() => Math.random() - 0.5).forEach((item) => {
+            const originalIdx = list.findIndex(x => x.c === item.c);
+            const div = document.createElement('div');
+            div.className = 'target-slot';
+            div.dataset.match = `skill-${originalIdx}`;
+            div.dataset.desc = item.d;
+            div.dataset.career = item.c;
+            div.dataset.skillName = item.s;
+            div.innerHTML = `<div class="career-name">${item.c}</div>`;
+            div.addEventListener('dragover', e => e.preventDefault());
+            div.addEventListener('dragenter', () => div.classList.add('hover'));
+            div.addEventListener('dragleave', () => div.classList.remove('hover'));
+            div.addEventListener('drop', handleDrop);
+            tCol.appendChild(div);
         });
     }
 
-    function closeModal() { $('#modal').hide(); }
-    function goHome() { $('#hub-page').css('display', 'grid'); $('#challenge-page').hide(); }
+    function handleDrop(e) {
+        e.preventDefault();
+        const slot = e.currentTarget;
+        slot.classList.remove('hover');
+        const draggedId = e.dataTransfer.getData('text');
+
+        if (slot.dataset.match === draggedId) {
+            // Correct Match
+            slot.classList.add('correct');
+            slot.innerHTML += `<div class="matched-skill">✓ ${slot.dataset.skillName}</div>`;
+            
+            // Hide the original draggable item
+            document.getElementById(draggedId).style.opacity = '0';
+            document.getElementById(draggedId).style.pointerEvents = 'none';
+            document.getElementById(draggedId).style.height = '0';
+            document.getElementById(draggedId).style.padding = '0';
+            document.getElementById(draggedId).style.margin = '0';
+            document.getElementById(draggedId).style.border = 'none';
+            
+            // Populate and show modal
+            document.getElementById('m-title').innerText = "Match Confirmed: " + slot.dataset.career;
+            document.getElementById('m-desc').innerText = slot.dataset.desc;
+            document.getElementById('modal').style.display = 'flex';
+        } else {
+            // Incorrect Match - Trigger Shake Error
+            slot.classList.remove('shake-error');
+            // Trigger reflow to restart animation
+            void slot.offsetWidth; 
+            slot.classList.add('shake-error');
+        }
+    }
+
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+    function goHome() { 
+        document.getElementById('hub-page').style.display = 'grid';
+        document.getElementById('challenge-page').style.display = 'none';
+    }
 </script>
 </body>
 </html>
